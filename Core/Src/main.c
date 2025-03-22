@@ -68,6 +68,10 @@ const char* haNoiURL = "http://api.open-meteo.com/v1/forecast?latitude=20.9714&l
 const char* tampereURL = "http://api.open-meteo.com/v1/forecast?latitude=61.4991&longitude=23.7871&current=temperature_2m,relative_humidity_2m,is_day&daily=weather_code&timezone=auto\r\n";
 const char* arnhemURL = "http://api.open-meteo.com/v1/forecast?latitude=51.98&longitude=5.9111&current=temperature_2m,relative_humidity_2m,is_day&daily=weather_code&timezone=auto\r\n";
 const char* sydneyURL = "http://api.open-meteo.com/v1/forecast?latitude=-33.8678&longitude=151.2073&current=temperature_2m,relative_humidity_2m,is_day&daily=weather_code&timezone=auto\r\n";
+
+//Request for garden info
+const char* requestGardenInfo = "?";
+
 //Variables for handling received UART data
 uint8_t tempBuffer[1];
 uint8_t rxBuffer[BUFFER_SIZE];
@@ -463,7 +467,7 @@ void gardenStateMenu()
 	gardenState = 1;
 	menu = 0;
 
-	HAL_UART_Transmit(&huart1, (uint8_t*)nhaTrangURL, strlen(nhaTrangURL), HAL_MAX_DELAY);
+	HAL_UART_Transmit(&huart1, (uint8_t*)requestGardenInfo, strlen(requestGardenInfo), HAL_MAX_DELAY);
 }
 
 void mainMenu()

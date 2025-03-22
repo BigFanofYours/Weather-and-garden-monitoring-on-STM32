@@ -2,8 +2,9 @@
 #include <ESP8266HTTPClient.h>
 const char* ssid = "1";
 const char* password = "25102004";
+const char* serverURL = "http://127.0.0.1:5000/request_data";
 WiFiClient wifiClient;
-String receivedURL = "";
+String receivedUART = "";
 
 void setup() 
 {
@@ -23,13 +24,17 @@ void loop()
     char incomingChar = Serial.read();
     if (incomingChar == '\n') 
     {
-      String jsonData = fetchWeatherData(receivedURL);
-      Serial.println(jsonData + "!");
-      receivedURL = "";
+      String weatherData = fetchWeatherData(receivedUART);
+      Serial.println(weatherData + "!");
+      receivedUART = "";
+    }
+    else if (incomingChar == '?')
+    {
+      fetchGardenData(receivedUART);
     }
     else 
     {
-      receivedURL += incomingChar;
+      receivedUART += incomingChar;
     }
   }
 }
@@ -60,4 +65,24 @@ String fetchWeatherData(String URL)
     http.end();
   } 
   return "{}?";
+}
+
+void fetchGardenData(String request)
+{
+  if (WiFi.status() == WL_CONNECTED) 
+  {
+    HTTPClient http;
+    http.begin(wifiClient, serverURL);
+    int httpCode = http.GET();
+    if (httpCode == HTTP_CODE_OK) 
+    {
+      String payload = http.getString();
+      Serial.println("Received Data: " + payload);
+    }  
+    else 
+    {
+      Serial.println("Failed to get data");
+    }
+    http.end();
+  }
 }
