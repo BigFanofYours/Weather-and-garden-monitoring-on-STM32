@@ -76,6 +76,9 @@ uint8_t rxComplete = 0;
 
 //Variables for switching between UIs
 uint16_t xCoordinates = 0, yCoordinates = 0;
+uint8_t wifi = 0;
+uint8_t weatherForecast = 0;
+uint8_t gardenState = 0;
 uint8_t menu = 1;
 
 //Variables for weather data handling
@@ -103,7 +106,9 @@ static void MX_SPI2_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 void drawMenuIcon();
-void drawMenu();
+void wifiMenu();
+void weatherForecastMenu();
+void mainMenu();
 void drawBufferScreen();
 void checkCoordinates();
 void drawWeather(uint16_t xPosition, uint16_t yPosition, int weatherCode);
@@ -114,7 +119,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 void processWeatherData(const char *jsonData);
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 void resetBuffer();
-void demo();
 /* USER CODE END 0 */
 
 /**
@@ -153,7 +157,6 @@ int main(void)
   LCD_BL_ON();
   lcdInit();
   lcdSetOrientation(PORTRAIT);
-  lcdFillRGB(COLOR_BLACK);
   HAL_UART_Receive_IT(&huart1, (uint8_t*)tempBuffer, 1);
   drawMenu();
   /* USER CODE END 2 */
@@ -309,8 +312,8 @@ static void MX_USART1_UART_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+  /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOH_CLK_ENABLE();
@@ -350,8 +353,8 @@ static void MX_GPIO_Init(void)
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+  /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* FSMC initialization function */
@@ -416,12 +419,23 @@ void drawMenuIcon()
 	lcdFillRoundRect(3, 16, 29, 3, 2, COLOR_BLACK);
 }
 
-void drawMenu()
+void wifiMenu()
 {
 	lcdSetTextFont(&Font16);
 	lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
 	lcdFillRGB(COLOR_BLACK);
-	menu = 1;
+	wifi = 1;
+	menu = 0;
+	drawAlignedText("Choose a network", 0, 240, 16, NOBACKCOLOR);
+}
+
+void weatherForecastMenu()
+{
+	lcdSetTextFont(&Font16);
+	lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
+	lcdFillRGB(COLOR_BLACK);
+	weatherForecast = 1;
+	menu = 0;
 	drawAlignedText("Choose a location", 0, 240, 16, NOBACKCOLOR);
 
 	lcdSetTextColor(COLOR_BLACK, COLOR_BLACK);
@@ -444,6 +458,31 @@ void drawMenu()
 	drawAlignedText("Sydney", 285, 240, 16, NOBACKCOLOR);
 }
 
+void gardenStateMenu()
+{
+	gardenState = 1;
+	menu = 0;
+}
+
+void mainMenu()
+{
+	lcdSetTextFont(&Font16);
+	lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
+	lcdFillRGB(COLOR_BLACK);
+	menu = 1;
+	drawAlignedText("Choose an option", 0, 240, 16, NOBACKCOLOR);
+
+	lcdSetTextColor(COLOR_BLACK, COLOR_BLACK);
+	lcdFillRoundRect(0, 32, 240, 40, 10, COLOR_WHITE);
+	drawAlignedText("Connect to WiFi", 45, 240, 16, NOBACKCOLOR);
+
+	lcdFillRoundRect(0, 80, 240, 40, 10, COLOR_WHITE);
+	drawAlignedText("Weather forecast", 93, 240, 16, NOBACKCOLOR);
+
+	lcdFillRoundRect(0, 272, 240, 40, 10, COLOR_WHITE);
+	drawAlignedText("Show garden state ", 141, 240, 16, NOBACKCOLOR);
+}
+
 void drawBufferScreen()
 {
 	menu = 0;
@@ -455,41 +494,45 @@ void drawBufferScreen()
 
 void checkCoordinates()
 {
-	if ((yCoordinates <= 30 && xCoordinates <= 30) && menu != 1)
-	{
-		drawMenu();
-	}
 	if ((yCoordinates >= 32 && yCoordinates <= 72) && menu == 1)
+	{
+		wifiMenu();
+	}
+	else if ((yCoordinates >= 80 && yCoordinates <= 120) && menu == 1)
+	{
+		weatherForecastMenu();
+	}
+	else if ((yCoordinates >= 32 && yCoordinates <= 72) && menu == 1)
 	{
 		drawBufferScreen();
 		sendAPIURL(SAIGON);
 		currentCity = 1;
 	}
-	if ((yCoordinates >= 80 && yCoordinates <= 120) && menu == 1)
+	else if ((yCoordinates >= 80 && yCoordinates <= 120) && menu == 1)
 	{
 		drawBufferScreen();
 		sendAPIURL(NHATRANG);
 		currentCity = 0;
 	}
-	if ((yCoordinates >= 128 && yCoordinates <= 168) && menu == 1)
+	else if ((yCoordinates >= 128 && yCoordinates <= 168) && menu == 1)
 	{
 		drawBufferScreen();
 		sendAPIURL(HANOI);
 		currentCity = 2;
 	}
-	if ((yCoordinates >= 176 && yCoordinates <= 216) && menu == 1)
+	else if ((yCoordinates >= 176 && yCoordinates <= 216) && menu == 1)
 	{
 		drawBufferScreen();
 		sendAPIURL(TAMPERE);
 		currentCity = 3;
 	}
-	if ((yCoordinates >= 224 && yCoordinates <= 264) && menu == 1)
+	else if ((yCoordinates >= 224 && yCoordinates <= 264) && menu == 1)
 	{
 		drawBufferScreen();
 		sendAPIURL(ARNHEM);
 		currentCity = 4;
 	}
-	if ((yCoordinates >= 272 && yCoordinates <= 312) && menu == 1)
+	else if ((yCoordinates >= 272 && yCoordinates <= 312) && menu == 1)
 	{
 		drawBufferScreen();
 		sendAPIURL(SYDNEY);
@@ -592,57 +635,18 @@ void drawInterface()
 	switch (currentCity)
 	{
 	case NHATRANG:
-		drawAlignedText("Nha Trang", 10, 240, NOBACKCOLOR);
+		drawAlignedText("Nha Trang", 10, 240, 16, NOBACKCOLOR);
 	case SAIGON:
-		drawAlignedText("Sai Gon", 10, 240, NOBACKCOLOR);
+		drawAlignedText("Sai Gon", 10, 240, 16, NOBACKCOLOR);
 	case HANOI:
-		drawAlignedText("Ha Noi", 10, 240, NOBACKCOLOR);
+		drawAlignedText("Ha Noi", 10, 240, 16, NOBACKCOLOR);
 	case TAMPERE:
-		drawAlignedText("Tampere", 10, 240, NOBACKCOLOR);
+		drawAlignedText("Tampere", 10, 240, 16, NOBACKCOLOR);
 	case ARNHEM:
-		drawAlignedText("Arnhem", 10, 240, NOBACKCOLOR);
+		drawAlignedText("Arnhem", 10, 240, 16, NOBACKCOLOR);
 	case SYDNEY:
-		drawAlignedText("Sydney", 10, 240, NOBACKCOLOR);
+		drawAlignedText("Sydney", 10, 240, 16, NOBACKCOLOR);
 	}
-}
-
-void demo()
-{
-	lcdFillRGB(COLOR_NAVY);
-	lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
-	drawClearDay(40, 190);
-	lcdSetCursor(25, 160);
-	lcdPrintfNoBackColor("test 1");
-
-	drawCloudyDay(90, 190);
-	lcdSetCursor(75, 160);
-	lcdPrintfNoBackColor("test 2");
-
-	drawRainyDay(150, 190);
-	lcdSetCursor(135, 160);
-	lcdPrintfNoBackColor("test 3");
-
-	drawSnowyDay(200, 190);
-	lcdSetCursor(185, 160);
-	lcdPrintfNoBackColor("test 4");
-
-	drawFoggyDay(65, 270);
-	lcdSetCursor(50, 240);
-	lcdPrintfNoBackColor("test 5");
-
-	drawStormyDay(120, 270);
-	lcdSetCursor(105, 240);
-	lcdPrintfNoBackColor("test 6");
-
-	drawClearDay(175, 270);
-	lcdSetCursor(160, 240);
-	lcdPrintfNoBackColor("test 7");
-
-	lcdSetCursor(80, 110);
-	lcdPrintfNoBackColor("Humidity: test%");
-	lcdSetTextFont(&Font20);
-	lcdSetCursor(110, 90);
-	lcdPrintfNoBackColor("test");
 }
 
 void reformatDate()

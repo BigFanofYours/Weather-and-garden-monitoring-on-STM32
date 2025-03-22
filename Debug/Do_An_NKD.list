@@ -1,5 +1,5 @@
 
-Do_An_TKHTN.elf:     file format elf32-littlearm
+Do_An_NKD.elf:     file format elf32-littlearm
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
@@ -7,19 +7,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   1 .text         0000a9b4  08000190  08000190  00001190  2**4
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .rodata       00028090  0800ab48  0800ab48  0000bb48  2**3
+  2 .rodata       00028040  0800ab48  0800ab48  0000bb48  2**3
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  3 .ARM.extab    00000000  08032bd8  08032bd8  0003422c  2**0
+  3 .ARM.extab    00000000  08032b88  08032b88  0003422c  2**0
                   CONTENTS, READONLY
-  4 .ARM          00000008  08032bd8  08032bd8  00033bd8  2**2
+  4 .ARM          00000008  08032b88  08032b88  00033b88  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  5 .preinit_array 00000000  08032be0  08032be0  0003422c  2**0
+  5 .preinit_array 00000000  08032b90  08032b90  0003422c  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  6 .init_array   00000004  08032be0  08032be0  00033be0  2**2
+  6 .init_array   00000004  08032b90  08032b90  00033b90  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  7 .fini_array   00000004  08032be4  08032be4  00033be4  2**2
+  7 .fini_array   00000004  08032b94  08032b94  00033b94  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  8 .data         0000022c  20000000  08032be8  00034000  2**2
+  8 .data         0000022c  20000000  08032b98  00034000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
   9 .ccmram       00000000  10000000  10000000  0003422c  2**0
                   CONTENTS
@@ -29,25 +29,25 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  12 .ARM.attributes 00000030  00000000  00000000  0003422c  2**0
                   CONTENTS, READONLY
- 13 .debug_info   000119d3  00000000  00000000  0003425c  2**0
+ 13 .debug_info   00011a08  00000000  00000000  0003425c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_abbrev 00002cad  00000000  00000000  00045c2f  2**0
+ 14 .debug_abbrev 00002cc4  00000000  00000000  00045c64  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_aranges 000011a8  00000000  00000000  000488e0  2**3
+ 15 .debug_aranges 000011b0  00000000  00000000  00048928  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00023a15  00000000  00000000  00049a88  2**0
+ 16 .debug_macro  00023a15  00000000  00000000  00049ad8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0001384e  00000000  00000000  0006d49d  2**0
+ 17 .debug_line   0001385a  00000000  00000000  0006d4ed  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000ceda9  00000000  00000000  00080ceb  2**0
+ 18 .debug_str    000cedd4  00000000  00000000  00080d47  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  0014fa94  2**0
+ 19 .comment      00000043  00000000  00000000  0014fb1b  2**0
                   CONTENTS, READONLY
- 20 .debug_rnglists 00000d9c  00000000  00000000  0014fad7  2**0
+ 20 .debug_rnglists 00000da2  00000000  00000000  0014fb5e  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_frame  00005bc0  00000000  00000000  00150874  2**2
+ 21 .debug_frame  00005be8  00000000  00000000  00150900  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_line_str 00000067  00000000  00000000  00156434  2**0
+ 22 .debug_line_str 00000065  00000000  00000000  001564e8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1552,10 +1552,10 @@ bool XPT2046_TouchGetCoordinates(uint16_t* x, uint16_t* y)
  8001112:	3728      	adds	r7, #40	@ 0x28
  8001114:	46bd      	mov	sp, r7
  8001116:	bd80      	pop	{r7, pc}
- 8001118:	080308cc 	.word	0x080308cc
+ 8001118:	0803087c 	.word	0x0803087c
  800111c:	20000458 	.word	0x20000458
- 8001120:	080308d0 	.word	0x080308d0
- 8001124:	080308d4 	.word	0x080308d4
+ 8001120:	08030880 	.word	0x08030880
+ 8001124:	08030884 	.word	0x08030884
  8001128:	51eb851f 	.word	0x51eb851f
  800112c:	4e8b8659 	.word	0x4e8b8659
 
@@ -1686,7 +1686,7 @@ static int case_insensitive_strcmp(const unsigned char *string1, const unsigned 
  80011fc:	46bd      	mov	sp, r7
  80011fe:	f85d 7b04 	ldr.w	r7, [sp], #4
  8001202:	4770      	bx	lr
- 8001204:	080329d8 	.word	0x080329d8
+ 8001204:	08032988 	.word	0x08032988
 
 08001208 <cJSON_New_Item>:
     }
@@ -8630,8 +8630,8 @@ static void MX_GPIO_Init(void)
  8003cd4:	609a      	str	r2, [r3, #8]
  8003cd6:	60da      	str	r2, [r3, #12]
  8003cd8:	611a      	str	r2, [r3, #16]
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+  /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOH_CLK_ENABLE();
@@ -8791,8 +8791,8 @@ static void MX_GPIO_Init(void)
  8003df6:	2017      	movs	r0, #23
  8003df8:	f001 f9ab 	bl	8005152 <HAL_NVIC_EnableIRQ>
 
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+  /* USER CODE END MX_GPIO_Init_2 */
 }
  8003dfc:	bf00      	nop
  8003dfe:	3730      	adds	r7, #48	@ 0x30
@@ -9000,6 +9000,9 @@ void drawMenuIcon()
 	...
 
 08003f30 <drawMenu>:
+{
+
+}
 
 void drawMenu()
 {
@@ -9802,8 +9805,8 @@ void drawInterface()
  80044da:	bd80      	pop	{r7, pc}
  80044dc:	20000054 	.word	0x20000054
  80044e0:	20000981 	.word	0x20000981
- 80044e4:	080308c0 	.word	0x080308c0
- 80044e8:	0801dcb4 	.word	0x0801dcb4
+ 80044e4:	08030870 	.word	0x08030870
+ 80044e8:	0801dc64 	.word	0x0801dc64
  80044ec:	2000000c 	.word	0x2000000c
  80044f0:	20000954 	.word	0x20000954
  80044f4:	20000984 	.word	0x20000984
@@ -9821,9 +9824,6 @@ void drawInterface()
  8004524:	0800af98 	.word	0x0800af98
 
 08004528 <reformatDate>:
-	lcdSetCursor(110, 90);
-	lcdPrintfNoBackColor("test");
-}
 
 void reformatDate()
 {
@@ -10113,8 +10113,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
  8004730:	2000094c 	.word	0x2000094c
  8004734:	20000548 	.word	0x20000548
  8004738:	2000094e 	.word	0x2000094e
- 800473c:	0800b01c 	.word	0x0800b01c
- 8004740:	0800b034 	.word	0x0800b034
+ 800473c:	0800afcc 	.word	0x0800afcc
+ 8004740:	0800afe4 	.word	0x0800afe4
  8004744:	200004b0 	.word	0x200004b0
  8004748:	2000054c 	.word	0x2000054c
 
@@ -10339,18 +10339,18 @@ void processWeatherData(const char *jsonData)
  80048a2:	373c      	adds	r7, #60	@ 0x3c
  80048a4:	46bd      	mov	sp, r7
  80048a6:	bd90      	pop	{r4, r7, pc}
- 80048a8:	0800b048 	.word	0x0800b048
- 80048ac:	0800b034 	.word	0x0800b034
- 80048b0:	0800b05c 	.word	0x0800b05c
- 80048b4:	0800b064 	.word	0x0800b064
- 80048b8:	0800b074 	.word	0x0800b074
- 80048bc:	0800b08c 	.word	0x0800b08c
+ 80048a8:	0800aff8 	.word	0x0800aff8
+ 80048ac:	0800afe4 	.word	0x0800afe4
+ 80048b0:	0800b00c 	.word	0x0800b00c
+ 80048b4:	0800b014 	.word	0x0800b014
+ 80048b8:	0800b024 	.word	0x0800b024
+ 80048bc:	0800b03c 	.word	0x0800b03c
  80048c0:	20000970 	.word	0x20000970
  80048c4:	20000974 	.word	0x20000974
  80048c8:	20000981 	.word	0x20000981
- 80048cc:	0800b094 	.word	0x0800b094
- 80048d0:	0800b09c 	.word	0x0800b09c
- 80048d4:	0800b0ac 	.word	0x0800b0ac
+ 80048cc:	0800b044 	.word	0x0800b044
+ 80048d0:	0800b04c 	.word	0x0800b04c
+ 80048d4:	0800b05c 	.word	0x0800b05c
  80048d8:	2000097e 	.word	0x2000097e
  80048dc:	20000984 	.word	0x20000984
  80048e0:	2000097c 	.word	0x2000097c
@@ -10529,10 +10529,10 @@ void HAL_MspInit(void)
  80049d4:	40023800 	.word	0x40023800
 
 080049d8 <HAL_SPI_MspInit>:
-* This function configures the hardware resources used in this example
-* @param hspi: SPI handle pointer
-* @retval None
-*/
+  * This function configures the hardware resources used in this example
+  * @param hspi: SPI handle pointer
+  * @retval None
+  */
 void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
 {
  80049d8:	b580      	push	{r7, lr}
@@ -10554,9 +10554,9 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
  80049f6:	4293      	cmp	r3, r2
  80049f8:	d12c      	bne.n	8004a54 <HAL_SPI_MspInit+0x7c>
   {
-  /* USER CODE BEGIN SPI2_MspInit 0 */
+    /* USER CODE BEGIN SPI2_MspInit 0 */
 
-  /* USER CODE END SPI2_MspInit 0 */
+    /* USER CODE END SPI2_MspInit 0 */
     /* Peripheral clock enable */
     __HAL_RCC_SPI2_CLK_ENABLE();
  80049fa:	2300      	movs	r3, #0
@@ -10611,7 +10611,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
  8004a4e:	4805      	ldr	r0, [pc, #20]	@ (8004a64 <HAL_SPI_MspInit+0x8c>)
  8004a50:	f000 fc2c 	bl	80052ac <HAL_GPIO_Init>
 
-  /* USER CODE END SPI2_MspInit 1 */
+    /* USER CODE END SPI2_MspInit 1 */
 
   }
 
@@ -10625,10 +10625,10 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
  8004a64:	40020400 	.word	0x40020400
 
 08004a68 <HAL_UART_MspInit>:
-* This function configures the hardware resources used in this example
-* @param huart: UART handle pointer
-* @retval None
-*/
+  * This function configures the hardware resources used in this example
+  * @param huart: UART handle pointer
+  * @retval None
+  */
 void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 {
  8004a68:	b580      	push	{r7, lr}
@@ -10650,9 +10650,9 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
  8004a86:	4293      	cmp	r3, r2
  8004a88:	d134      	bne.n	8004af4 <HAL_UART_MspInit+0x8c>
   {
-  /* USER CODE BEGIN USART1_MspInit 0 */
+    /* USER CODE BEGIN USART1_MspInit 0 */
 
-  /* USER CODE END USART1_MspInit 0 */
+    /* USER CODE END USART1_MspInit 0 */
     /* Peripheral clock enable */
     __HAL_RCC_USART1_CLK_ENABLE();
  8004a8a:	2300      	movs	r3, #0
@@ -10716,7 +10716,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
  8004aee:	2025      	movs	r0, #37	@ 0x25
  8004af0:	f000 fb2f 	bl	8005152 <HAL_NVIC_EnableIRQ>
 
-  /* USER CODE END USART1_MspInit 1 */
+    /* USER CODE END USART1_MspInit 1 */
 
   }
 
@@ -11494,7 +11494,7 @@ LoopFillZerobss:
   ldr r1, =_edata
  8004e24:	2000022c 	.word	0x2000022c
   ldr r2, =_sidata
- 8004e28:	08032be8 	.word	0x08032be8
+ 8004e28:	08032b98 	.word	0x08032b98
   ldr r2, =_sbss
  8004e2c:	2000022c 	.word	0x2000022c
   ldr r4, =_ebss
@@ -14205,7 +14205,7 @@ HAL_StatusTypeDef HAL_RCC_ClockConfig(RCC_ClkInitTypeDef  *RCC_ClkInitStruct, ui
  8005d1e:	bf00      	nop
  8005d20:	40023c00 	.word	0x40023c00
  8005d24:	40023800 	.word	0x40023800
- 8005d28:	08032804 	.word	0x08032804
+ 8005d28:	080327b4 	.word	0x080327b4
  8005d2c:	20000058 	.word	0x20000058
  8005d30:	2000005c 	.word	0x2000005c
 
@@ -14509,7 +14509,7 @@ uint32_t HAL_RCC_GetPCLK1Freq(void)
  8005f74:	4618      	mov	r0, r3
  8005f76:	bd80      	pop	{r7, pc}
  8005f78:	40023800 	.word	0x40023800
- 8005f7c:	08032814 	.word	0x08032814
+ 8005f7c:	080327c4 	.word	0x080327c4
 
 08005f80 <HAL_RCC_GetPCLK2Freq>:
   * @note   Each time PCLK2 changes, this function must be called to update the
@@ -14535,7 +14535,7 @@ uint32_t HAL_RCC_GetPCLK2Freq(void)
  8005f9c:	4618      	mov	r0, r3
  8005f9e:	bd80      	pop	{r7, pc}
  8005fa0:	40023800 	.word	0x40023800
- 8005fa4:	08032814 	.word	0x08032814
+ 8005fa4:	080327c4 	.word	0x080327c4
 
 08005fa8 <HAL_SPI_Init>:
   * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
@@ -19538,8 +19538,8 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  8007fe8:	e782      	b.n	8007ef0 <_strtod_l+0x190>
  8007fea:	f04f 0c01 	mov.w	ip, #1
  8007fee:	e7f8      	b.n	8007fe2 <_strtod_l+0x282>
- 8007ff0:	08032998 	.word	0x08032998
- 8007ff4:	0803281c 	.word	0x0803281c
+ 8007ff0:	08032948 	.word	0x08032948
+ 8007ff4:	080327cc 	.word	0x080327cc
  8007ff8:	7ff00000 	.word	0x7ff00000
  8007ffc:	9a19      	ldr	r2, [sp, #100]	@ 0x64
  8007ffe:	1c51      	adds	r1, r2, #1
@@ -19829,13 +19829,13 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  80082d4:	f04f 0b00 	mov.w	fp, #0
  80082d8:	6013      	str	r3, [r2, #0]
  80082da:	e76b      	b.n	80081b4 <_strtod_l+0x454>
- 80082dc:	08032827 	.word	0x08032827
- 80082e0:	08032984 	.word	0x08032984
- 80082e4:	0803281e 	.word	0x0803281e
- 80082e8:	08032821 	.word	0x08032821
- 80082ec:	08032981 	.word	0x08032981
- 80082f0:	08032b10 	.word	0x08032b10
- 80082f4:	08032ae8 	.word	0x08032ae8
+ 80082dc:	080327d7 	.word	0x080327d7
+ 80082e0:	08032934 	.word	0x08032934
+ 80082e4:	080327ce 	.word	0x080327ce
+ 80082e8:	080327d1 	.word	0x080327d1
+ 80082ec:	08032931 	.word	0x08032931
+ 80082f0:	08032ac0 	.word	0x08032ac0
+ 80082f4:	08032a98 	.word	0x08032a98
  80082f8:	7ff00000 	.word	0x7ff00000
  80082fc:	7ca00000 	.word	0x7ca00000
  8008300:	7fefffff 	.word	0x7fefffff
@@ -20121,7 +20121,7 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  80085ae:	2322      	movs	r3, #34	@ 0x22
  80085b0:	6013      	str	r3, [r2, #0]
  80085b2:	e603      	b.n	80081bc <_strtod_l+0x45c>
- 80085b4:	080329b0 	.word	0x080329b0
+ 80085b4:	08032960 	.word	0x08032960
  80085b8:	fffffc02 	.word	0xfffffc02
  80085bc:	39500000 	.word	0x39500000
  80085c0:	7ff00000 	.word	0x7ff00000
@@ -20896,10 +20896,10 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  8008d06:	4798      	blx	r3
  8008d08:	3601      	adds	r6, #1
  8008d0a:	e7f2      	b.n	8008cf2 <__libc_init_array+0x1e>
- 8008d0c:	08032be0 	.word	0x08032be0
- 8008d10:	08032be0 	.word	0x08032be0
- 8008d14:	08032be0 	.word	0x08032be0
- 8008d18:	08032be4 	.word	0x08032be4
+ 8008d0c:	08032b90 	.word	0x08032b90
+ 8008d10:	08032b90 	.word	0x08032b90
+ 8008d14:	08032b90 	.word	0x08032b90
+ 8008d18:	08032b94 	.word	0x08032b94
 
 08008d1c <__retarget_lock_init_recursive>:
  8008d1c:	4770      	bx	lr
@@ -21377,9 +21377,9 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  800916e:	2b00      	cmp	r3, #0
  8009170:	d1dd      	bne.n	800912e <__gethex+0x26a>
  8009172:	e7ee      	b.n	8009152 <__gethex+0x28e>
- 8009174:	0803281c 	.word	0x0803281c
- 8009178:	08032832 	.word	0x08032832
- 800917c:	08032843 	.word	0x08032843
+ 8009174:	080327cc 	.word	0x080327cc
+ 8009178:	080327e2 	.word	0x080327e2
+ 800917c:	080327f3 	.word	0x080327f3
  8009180:	1e6f      	subs	r7, r5, #1
  8009182:	f1b9 0f00 	cmp.w	r9, #0
  8009186:	d130      	bne.n	80091ea <__gethex+0x326>
@@ -21514,7 +21514,7 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  80092da:	42b0      	cmp	r0, r6
  80092dc:	dbe7      	blt.n	80092ae <__gethex+0x3ea>
  80092de:	e7f0      	b.n	80092c2 <__gethex+0x3fe>
- 80092e0:	08032832 	.word	0x08032832
+ 80092e0:	080327e2 	.word	0x080327e2
 
 080092e4 <L_shift>:
  80092e4:	f1c2 0208 	rsb	r2, r2, #8
@@ -21753,8 +21753,8 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  80094fc:	e9c0 3303 	strd	r3, r3, [r0, #12]
  8009500:	e7f7      	b.n	80094f2 <_Balloc+0x66>
  8009502:	bf00      	nop
- 8009504:	080328a3 	.word	0x080328a3
- 8009508:	080328ba 	.word	0x080328ba
+ 8009504:	08032853 	.word	0x08032853
+ 8009508:	0803286a 	.word	0x0803286a
 
 0800950c <_Bfree>:
  800950c:	b570      	push	{r4, r5, r6, lr}
@@ -21782,8 +21782,8 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  8009540:	6021      	str	r1, [r4, #0]
  8009542:	f843 4022 	str.w	r4, [r3, r2, lsl #2]
  8009546:	bd70      	pop	{r4, r5, r6, pc}
- 8009548:	080328a3 	.word	0x080328a3
- 800954c:	080328ba 	.word	0x080328ba
+ 8009548:	08032853 	.word	0x08032853
+ 800954c:	0803286a 	.word	0x0803286a
 
 08009550 <__multadd>:
  8009550:	e92d 41f0 	stmdb	sp!, {r4, r5, r6, r7, r8, lr}
@@ -21837,8 +21837,8 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  80095cc:	6125      	str	r5, [r4, #16]
  80095ce:	4620      	mov	r0, r4
  80095d0:	e8bd 81f0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, pc}
- 80095d4:	08032832 	.word	0x08032832
- 80095d8:	080328ba 	.word	0x080328ba
+ 80095d4:	080327e2 	.word	0x080327e2
+ 80095d8:	0803286a 	.word	0x0803286a
 
 080095dc <__s2b>:
  80095dc:	e92d 43f8 	stmdb	sp!, {r3, r4, r5, r6, r7, r8, r9, lr}
@@ -21899,8 +21899,8 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  8009660:	f7ff ff76 	bl	8009550 <__multadd>
  8009664:	e7ee      	b.n	8009644 <__s2b+0x68>
  8009666:	bf00      	nop
- 8009668:	08032832 	.word	0x08032832
- 800966c:	080328ba 	.word	0x080328ba
+ 8009668:	080327e2 	.word	0x080327e2
+ 800966c:	0803286a 	.word	0x0803286a
 
 08009670 <__hi0bits>:
  8009670:	f5b0 3f80 	cmp.w	r0, #65536	@ 0x10000
@@ -21990,8 +21990,8 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  8009726:	6103      	str	r3, [r0, #16]
  8009728:	bd10      	pop	{r4, pc}
  800972a:	bf00      	nop
- 800972c:	08032832 	.word	0x08032832
- 8009730:	080328ba 	.word	0x080328ba
+ 800972c:	080327e2 	.word	0x080327e2
+ 8009730:	0803286a 	.word	0x0803286a
 
 08009734 <__multiply>:
  8009734:	e92d 4ff0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
@@ -22110,8 +22110,8 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  800986a:	e79f      	b.n	80097ac <__multiply+0x78>
  800986c:	3e01      	subs	r6, #1
  800986e:	e7a1      	b.n	80097b4 <__multiply+0x80>
- 8009870:	08032832 	.word	0x08032832
- 8009874:	080328ba 	.word	0x080328ba
+ 8009870:	080327e2 	.word	0x080327e2
+ 8009874:	0803286a 	.word	0x0803286a
 
 08009878 <__pow5mult>:
  8009878:	e92d 43f8 	stmdb	sp!, {r3, r4, r5, r6, r7, r8, r9, lr}
@@ -22179,9 +22179,9 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  8009918:	4630      	mov	r0, r6
  800991a:	e8bd 83f8 	ldmia.w	sp!, {r3, r4, r5, r6, r7, r8, r9, pc}
  800991e:	bf00      	nop
- 8009920:	08032adc 	.word	0x08032adc
- 8009924:	080328a3 	.word	0x080328a3
- 8009928:	080328ba 	.word	0x080328ba
+ 8009920:	08032a8c 	.word	0x08032a8c
+ 8009924:	08032853 	.word	0x08032853
+ 8009928:	0803286a 	.word	0x0803286a
 
 0800992c <__lshift>:
  800992c:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
@@ -22260,8 +22260,8 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  80099f6:	d8f9      	bhi.n	80099ec <__lshift+0xc0>
  80099f8:	e7ea      	b.n	80099d0 <__lshift+0xa4>
  80099fa:	bf00      	nop
- 80099fc:	08032832 	.word	0x08032832
- 8009a00:	080328ba 	.word	0x080328ba
+ 80099fc:	080327e2 	.word	0x080327e2
+ 8009a00:	0803286a 	.word	0x0803286a
 
 08009a04 <__mcmp>:
  8009a04:	690a      	ldr	r2, [r1, #16]
@@ -22397,8 +22397,8 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  8009b56:	3f01      	subs	r7, #1
  8009b58:	e7e7      	b.n	8009b2a <__mdiff+0xee>
  8009b5a:	bf00      	nop
- 8009b5c:	08032832 	.word	0x08032832
- 8009b60:	080328ba 	.word	0x080328ba
+ 8009b5c:	080327e2 	.word	0x080327e2
+ 8009b60:	0803286a 	.word	0x0803286a
 
 08009b64 <__ulp>:
  8009b64:	b082      	sub	sp, #8
@@ -22548,8 +22548,8 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  8009ce2:	f7ff fcc5 	bl	8009670 <__hi0bits>
  8009ce6:	ebc0 1042 	rsb	r0, r0, r2, lsl #5
  8009cea:	e7e5      	b.n	8009cb8 <__d2b+0x74>
- 8009cec:	08032832 	.word	0x08032832
- 8009cf0:	080328ba 	.word	0x080328ba
+ 8009cec:	080327e2 	.word	0x080327e2
+ 8009cf0:	0803286a 	.word	0x0803286a
 
 08009cf4 <__ratio>:
  8009cf4:	e92d 4ff0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
@@ -22944,11 +22944,11 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  800a09c:	4638      	mov	r0, r7
  800a09e:	f000 f879 	bl	800a194 <_printf_i>
  800a0a2:	e7ed      	b.n	800a080 <_svfiprintf_r+0x1c0>
- 800a0a4:	08032913 	.word	0x08032913
- 800a0a8:	0803291d 	.word	0x0803291d
+ 800a0a4:	080328c3 	.word	0x080328c3
+ 800a0a8:	080328cd 	.word	0x080328cd
  800a0ac:	00000000 	.word	0x00000000
  800a0b0:	08009e0b 	.word	0x08009e0b
- 800a0b4:	08032919 	.word	0x08032919
+ 800a0b4:	080328c9 	.word	0x080328c9
 
 0800a0b8 <_printf_common>:
  800a0b8:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
@@ -23277,8 +23277,8 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  800a3c0:	2500      	movs	r5, #0
  800a3c2:	f104 0619 	add.w	r6, r4, #25
  800a3c6:	e7f5      	b.n	800a3b4 <_printf_i+0x220>
- 800a3c8:	08032924 	.word	0x08032924
- 800a3cc:	08032935 	.word	0x08032935
+ 800a3c8:	080328d4 	.word	0x080328d4
+ 800a3cc:	080328e5 	.word	0x080328e5
 
 0800a3d0 <__sflush_r>:
  800a3d0:	f9b1 200c 	ldrsh.w	r2, [r1, #12]
@@ -23481,9 +23481,9 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  800a584:	e7f3      	b.n	800a56e <__assert_func+0x12>
  800a586:	bf00      	nop
  800a588:	200001dc 	.word	0x200001dc
- 800a58c:	08032946 	.word	0x08032946
- 800a590:	08032953 	.word	0x08032953
- 800a594:	08032981 	.word	0x08032981
+ 800a58c:	080328f6 	.word	0x080328f6
+ 800a590:	08032903 	.word	0x08032903
+ 800a594:	08032931 	.word	0x08032931
 
 0800a598 <_calloc_r>:
  800a598:	b570      	push	{r4, r5, r6, lr}
@@ -23790,11 +23790,11 @@ HAL_StatusTypeDef FSMC_NORSRAM_Extended_Timing_Init(FSMC_NORSRAM_EXTENDED_TypeDe
  800a858:	4630      	mov	r0, r6
  800a85a:	f7ff fc9b 	bl	800a194 <_printf_i>
  800a85e:	e7e4      	b.n	800a82a <_vfiprintf_r+0x1e6>
- 800a860:	08032913 	.word	0x08032913
- 800a864:	0803291d 	.word	0x0803291d
+ 800a860:	080328c3 	.word	0x080328c3
+ 800a864:	080328cd 	.word	0x080328cd
  800a868:	00000000 	.word	0x00000000
  800a86c:	0800a621 	.word	0x0800a621
- 800a870:	08032919 	.word	0x08032919
+ 800a870:	080328c9 	.word	0x080328c9
 
 0800a874 <__swbuf_r>:
  800a874:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
