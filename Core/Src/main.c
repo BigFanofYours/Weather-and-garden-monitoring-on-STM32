@@ -462,6 +462,8 @@ void gardenStateMenu()
 {
 	gardenState = 1;
 	menu = 0;
+
+	HAL_UART_Transmit(&huart1, (uint8_t*)nhaTrangURL, strlen(nhaTrangURL), HAL_MAX_DELAY);
 }
 
 void mainMenu()
