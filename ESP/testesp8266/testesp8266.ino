@@ -31,7 +31,7 @@ void loop()
     }
     else if (incomingChar == '?')
     {
-      fetchGardenData(receivedUART);
+      fetchGardenData();
       receivedUART = "";
     }
     else 
@@ -65,7 +65,7 @@ String fetchWeatherData(String URL)
   return "{}?";
 }
 
-void fetchGardenData(String request)
+void fetchGardenData()
 {
   if (WiFi.status() == WL_CONNECTED) 
   {
