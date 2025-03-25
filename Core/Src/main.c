@@ -162,7 +162,7 @@ int main(void)
   lcdInit();
   lcdSetOrientation(PORTRAIT);
   HAL_UART_Receive_IT(&huart1, (uint8_t*)tempBuffer, 1);
-  drawMenu();
+  mainMenu();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -466,7 +466,6 @@ void gardenStateMenu()
 {
 	gardenState = 1;
 	menu = 0;
-
 	HAL_UART_Transmit(&huart1, (uint8_t*)requestGardenInfo, strlen(requestGardenInfo), HAL_MAX_DELAY);
 }
 
@@ -508,37 +507,41 @@ void checkCoordinates()
 	{
 		weatherForecastMenu();
 	}
-	else if ((yCoordinates >= 32 && yCoordinates <= 72) && menu == 1)
+	else if ((yCoordinates >= 272 && yCoordinates <= 312) && menu == 1)
+	{
+		gardenStateMenu();
+	}
+	else if ((yCoordinates >= 32 && yCoordinates <= 72) && weatherForecast == 1)
 	{
 		drawBufferScreen();
 		sendAPIURL(SAIGON);
 		currentCity = 1;
 	}
-	else if ((yCoordinates >= 80 && yCoordinates <= 120) && menu == 1)
+	else if ((yCoordinates >= 80 && yCoordinates <= 120) && weatherForecast == 1)
 	{
 		drawBufferScreen();
 		sendAPIURL(NHATRANG);
 		currentCity = 0;
 	}
-	else if ((yCoordinates >= 128 && yCoordinates <= 168) && menu == 1)
+	else if ((yCoordinates >= 128 && yCoordinates <= 168) && weatherForecast == 1)
 	{
 		drawBufferScreen();
 		sendAPIURL(HANOI);
 		currentCity = 2;
 	}
-	else if ((yCoordinates >= 176 && yCoordinates <= 216) && menu == 1)
+	else if ((yCoordinates >= 176 && yCoordinates <= 216) && weatherForecast == 1)
 	{
 		drawBufferScreen();
 		sendAPIURL(TAMPERE);
 		currentCity = 3;
 	}
-	else if ((yCoordinates >= 224 && yCoordinates <= 264) && menu == 1)
+	else if ((yCoordinates >= 224 && yCoordinates <= 264) && weatherForecast == 1)
 	{
 		drawBufferScreen();
 		sendAPIURL(ARNHEM);
 		currentCity = 4;
 	}
-	else if ((yCoordinates >= 272 && yCoordinates <= 312) && menu == 1)
+	else if ((yCoordinates >= 272 && yCoordinates <= 312) && weatherForecast == 1)
 	{
 		drawBufferScreen();
 		sendAPIURL(SYDNEY);
