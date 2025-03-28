@@ -1,10 +1,14 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+
 const char* ssid = "1";
 const char* password = "25102004";
-const char* serverURL = "http://127.0.0.1:5000/request?q?";
+const char* mqttServer = "test.mosquitto.org";
+const char* requestTopic = "esp/request";    
+const char* responseTopic = "esp/response";  
+
 WiFiClient wifiClient;
-HTTPClient http;
+PubSubClient client(espClient);
 String receivedUART = "";
 
 void setup() 
@@ -16,10 +20,17 @@ void setup()
   {
     delay(500);
   }
+  client.setServer(mqttServer, 1883);
+  client.setCallback(callback);
 }
 
 void loop() 
 {  
+  if (!client.connected()) 
+  {
+    reconnect();
+  }
+  client.loop();
   if (Serial.available()) 
   {
     char incomingChar = Serial.read();
@@ -39,6 +50,16 @@ void loop()
       receivedUART += incomingChar;
     }
   }
+}
+
+void callback(char* topic, byte* payload, unsigned int length) 
+{
+  String message;
+  for (int i = 0; i < length; i++) 
+  {
+   message += (char)payload[i];
+  }
+  Serial.println("Received Sensor Data: " + message);
 }
 
 String trimWhiteSpace(String input) 
@@ -65,22 +86,28 @@ String fetchWeatherData(String URL)
   return "{}?";
 }
 
-void fetchGardenData()
+
+void reconnect() 
 {
-  if (WiFi.status() == WL_CONNECTED) 
+  while (!client.connected()) 
   {
-    http.begin(wifiClient, serverURL);
-    int httpCode = http.GET();
-    if (httpCode == HTTP_CODE_OK) 
+    if (client.connect("RequesterESP")) 
     {
-      String payload = http.getString();
-      http.end();
-      Serial.println(payload);  
-    }  
+      Serial.println("Connected to MQTT!");
+      client.subscribe(responseTopic);
+    } 
     else 
     {
-      Serial.println("Failed to get data");
+      delay(2000);
     }
-    http.end();
   }
+}
+
+void fetchGardenData()
+{
+  if (!client.connected()) 
+  {
+    reconnect();
+  }
+  client.publish(requestTopic, "?");
 }
