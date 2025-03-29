@@ -1,5 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <PubSubClient.h>
 
 const char* ssid = "1";
 const char* password = "25102004";
@@ -8,7 +9,8 @@ const char* requestTopic = "esp/request";
 const char* responseTopic = "esp/response";  
 
 WiFiClient wifiClient;
-PubSubClient client(espClient);
+HTTPClient http;
+PubSubClient client(wifiClient);
 String receivedUART = "";
 
 void setup() 
@@ -20,17 +22,11 @@ void setup()
   {
     delay(500);
   }
-  client.setServer(mqttServer, 1883);
   client.setCallback(callback);
 }
 
 void loop() 
 {  
-  if (!client.connected()) 
-  {
-    reconnect();
-  }
-  client.loop();
   if (Serial.available()) 
   {
     char incomingChar = Serial.read();
@@ -59,7 +55,7 @@ void callback(char* topic, byte* payload, unsigned int length)
   {
    message += (char)payload[i];
   }
-  Serial.println("Received Sensor Data: " + message);
+  Serial.println(message);
 }
 
 String trimWhiteSpace(String input) 
@@ -86,28 +82,18 @@ String fetchWeatherData(String URL)
   return "{}?";
 }
 
-
-void reconnect() 
-{
-  while (!client.connected()) 
-  {
-    if (client.connect("RequesterESP")) 
-    {
-      Serial.println("Connected to MQTT!");
-      client.subscribe(responseTopic);
-    } 
-    else 
-    {
-      delay(2000);
-    }
-  }
-}
-
 void fetchGardenData()
 {
-  if (!client.connected()) 
+  client.setServer(mqttServer, 1883);
+  if (client.connect("RequesterESP")) 
   {
-    reconnect();
+    client.subscribe(responseTopic);
+    client.publish(requestTopic, "?");
+    unsigned long startTime = millis();
+    while (millis() - startTime < 5000)
+    {
+      client.loop();
+    }
+    client.disconnect();
   }
-  client.publish(requestTopic, "?");
 }

@@ -15,61 +15,57 @@ PubSubClient client(wifiClient);
 #define DHTTYPE DHT22
 DHT dht(DHTPIN, DHTTYPE);
 
-void callback(char* topic, byte* payload, unsigned int length) 
-{
-    String message;
-    for (int i = 0; i < length; i++) 
-    {
-        message += (char)payload[i];
-    }
-    
-    if (message == "?") 
-    {
-        float temp = dht.readTemperature();
-        float hum = dht.readHumidity();
-        if (isnan(temp) || isnan(hum)) return;
-
-        String data = "{\"temperature\":" + String(temp) + ",\"humidity\":" + String(hum) + "}";
-        Serial.println("Publishing: " + data);
-        client.publish(responseTopic, data.c_str());
-    }
-}
-
 void setup() 
 {
-    Serial.begin(9600);
-    WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED) 
-    {
-        delay(500);
-    }
-    
-    client.setServer(mqttServer, 1883);
-    client.setCallback(callback);
-    dht.begin();
+  Serial.begin(9600);
+  delay(5000);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) 
+  {
+    delay(500);
+  }
+  client.setServer(mqttServer, 1883);
+  client.setCallback(callback);
+  dht.begin();
 }
 
 void loop() 
 {
-    if (!client.connected()) 
-    {
-        reconnect();
-    }
-    client.loop();  // Must be called to receive MQTT messages
+  if (!client.connected()) 
+  {
+    reconnect();
+  }
+  client.loop();
+}
+
+void callback(char* topic, byte* payload, unsigned int length) 
+{
+  String message;
+  for (int i = 0; i < length; i++) 
+  {
+    message += (char)payload[i];
+  } 
+  if (message == "?") 
+  {
+    float temp = dht.readTemperature();
+    float hum = dht.readHumidity();
+    String data = "{\"temperature\":" + String(temp) + ",\"humidity\":" + String(hum) + "}";
+    client.publish(responseTopic, data.c_str());
+  }
 }
 
 void reconnect() 
 {
-    while (!client.connected()) 
+  while (!client.connected()) 
+  {
+    if (client.connect("SensorESP")) 
     {
-        if (client.connect("SensorESP")) 
-        {
-            Serial.println("Connected to MQTT!");
-            client.subscribe(requestTopic);  // Listen for "?" requests
-        } 
-        else 
-        {
-            delay(2000);
-        }
+      Serial.println("Connected to MQTT!");
+      client.subscribe(requestTopic);  // Listen for "?" requests
+    } 
+    else 
+    {
+      delay(2000);
     }
+  }
 }
