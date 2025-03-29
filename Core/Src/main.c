@@ -116,7 +116,7 @@ void mainMenu();
 void drawBufferScreen();
 void checkCoordinates();
 void drawWeather(uint16_t xPosition, uint16_t yPosition, int weatherCode);
-void drawInterface();
+void drawWeatherForecastInterface();
 void reformatDate();
 void sendAPIURL(uint16_t chooseCity);
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
@@ -466,7 +466,28 @@ void gardenStateMenu()
 {
 	gardenState = 1;
 	menu = 0;
-	HAL_UART_Transmit(&huart1, (uint8_t*)requestGardenInfo, strlen(requestGardenInfo), HAL_MAX_DELAY);
+	uint16_t color;
+	if (isDay == 0)
+	{
+		lcdDrawImage(0, 0, &imageNight);
+		color = COLOR_NAVY;
+		lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
+	}
+	else
+	{
+		lcdDrawImage(0, 0, &imageDay);
+		color = COLOR_CYAN;
+		lcdSetTextColor(COLOR_BLACK, COLOR_BLACK);
+	}
+	drawMenuIcon();
+
+	for (int y = 160; y < 320; y++)
+	{
+		for (int x = 0; x < 240; x++)
+		{
+			lcdDrawPixel(x, y, color);
+		}
+	}
 }
 
 void mainMenu()
@@ -494,13 +515,14 @@ void drawBufferScreen()
 	lcdFillRGB(COLOR_BLACK);
 	drawMenuIcon();
 	lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
-	drawAlignedText("Fetching weather data", 160, 240, 16, NOBACKCOLOR);
+	drawAlignedText("Fetching data", 160, 240, 16, NOBACKCOLOR);
 }
 
 void checkCoordinates()
 {
 	if ((yCoordinates >= 32 && yCoordinates <= 72) && menu == 1)
 	{
+		drawBufferScreen();
 		wifiMenu();
 	}
 	else if ((yCoordinates >= 80 && yCoordinates <= 120) && menu == 1)
@@ -509,6 +531,8 @@ void checkCoordinates()
 	}
 	else if ((yCoordinates >= 272 && yCoordinates <= 312) && menu == 1)
 	{
+		drawBufferScreen();
+		sendGardenStateRequest();
 		gardenStateMenu();
 	}
 	else if ((yCoordinates >= 32 && yCoordinates <= 72) && weatherForecast == 1)
@@ -577,7 +601,7 @@ void drawWeather(uint16_t xPosition, uint16_t yPosition, int weatherCode)
 	}
 }
 
-void drawInterface()
+void drawWeatherForecastInterface()
 {
 	menu = 0;
 	uint16_t color;
@@ -658,6 +682,22 @@ void drawInterface()
 	}
 }
 
+void drawInterface()
+{
+	if (wifi == 1)
+	{
+
+	}
+	else if (weatherForecast == 1)
+	{
+		drawWeatherForecastInterface();
+	}
+	else if (gardenState == 1)
+	{
+		drawGardenState();
+	}
+}
+
 void reformatDate()
 {
 	char temp[6];
@@ -697,6 +737,11 @@ void sendAPIURL(uint16_t chooseCity)
     	HAL_UART_Transmit(&huart1, (uint8_t*)sydneyURL, strlen(sydneyURL), HAL_MAX_DELAY);
     	break;
     }
+}
+
+void sendGardenStateRequest()
+{
+	HAL_UART_Transmit(&huart1, (uint8_t*)requestGardenInfo, strlen(requestGardenInfo), HAL_MAX_DELAY);
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
