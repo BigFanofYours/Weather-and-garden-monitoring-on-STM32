@@ -26,6 +26,10 @@ void setup()
   }
   client.setServer(mqttServer, 1883);
   client.setCallback(callback);
+  if (client.connect("SensorESP"))
+  {
+    client.subscribe(requestTopic);
+  }
   dht.begin();
 }
 

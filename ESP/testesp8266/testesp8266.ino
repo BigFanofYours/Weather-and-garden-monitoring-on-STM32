@@ -50,12 +50,12 @@ void loop()
 
 void callback(char* topic, byte* payload, unsigned int length) 
 {
-  String message;
+  String gardenStateInfo;
   for (int i = 0; i < length; i++) 
   {
-   message += (char)payload[i];
+   gardenStateInfo += (char)payload[i];
   }
-  Serial.println(message);
+  Serial.println(gardenStateInfo + "!");
 }
 
 String trimWhiteSpace(String input) 
