@@ -95,6 +95,10 @@ uint16_t dateIndex = 0;
 uint8_t processComplete = 0;
 uint8_t isDay = 0;
 char* date[7];
+
+//Variables for garden state
+int gardenTemperature = 0;
+int gardenHumidity = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -116,9 +120,12 @@ void mainMenu();
 void drawBufferScreen();
 void checkCoordinates();
 void drawWeather(uint16_t xPosition, uint16_t yPosition, int weatherCode);
-void drawWeatherForecastInterface();
+void weatherForecastInterface();
+void gardenStateInterface();
+void drawInterface();
 void reformatDate();
 void sendAPIURL(uint16_t chooseCity);
+void sendGardenStateRequest();
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 void processWeatherData(const char *jsonData);
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
@@ -462,40 +469,15 @@ void weatherForecastMenu()
 	drawAlignedText("Sydney", 285, 240, 16, NOBACKCOLOR);
 }
 
-void gardenStateMenu()
-{
-	gardenState = 1;
-	menu = 0;
-	uint16_t color;
-	if (isDay == 0)
-	{
-		lcdDrawImage(0, 0, &imageNight);
-		color = COLOR_NAVY;
-		lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
-	}
-	else
-	{
-		lcdDrawImage(0, 0, &imageDay);
-		color = COLOR_CYAN;
-		lcdSetTextColor(COLOR_BLACK, COLOR_BLACK);
-	}
-	drawMenuIcon();
-
-	for (int y = 160; y < 320; y++)
-	{
-		for (int x = 0; x < 240; x++)
-		{
-			lcdDrawPixel(x, y, color);
-		}
-	}
-}
-
 void mainMenu()
 {
 	lcdSetTextFont(&Font16);
 	lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
 	lcdFillRGB(COLOR_BLACK);
 	menu = 1;
+	gardenState = 0;
+	weatherForecast = 0;
+	wifi = 0;
 	drawAlignedText("Choose an option", 0, 240, 16, NOBACKCOLOR);
 
 	lcdSetTextColor(COLOR_BLACK, COLOR_BLACK);
@@ -533,7 +515,7 @@ void checkCoordinates()
 	{
 		drawBufferScreen();
 		sendGardenStateRequest();
-		gardenStateMenu();
+		gardenStateInterface();
 	}
 	else if ((yCoordinates >= 32 && yCoordinates <= 72) && weatherForecast == 1)
 	{
@@ -601,7 +583,7 @@ void drawWeather(uint16_t xPosition, uint16_t yPosition, int weatherCode)
 	}
 }
 
-void drawWeatherForecastInterface()
+void weatherForecastInterface()
 {
 	menu = 0;
 	uint16_t color;
@@ -667,34 +649,67 @@ void drawWeatherForecastInterface()
 
 	switch (currentCity)
 	{
-	case NHATRANG:
-		drawAlignedText("Nha Trang", 10, 240, 16, NOBACKCOLOR);
-	case SAIGON:
-		drawAlignedText("Sai Gon", 10, 240, 16, NOBACKCOLOR);
-	case HANOI:
-		drawAlignedText("Ha Noi", 10, 240, 16, NOBACKCOLOR);
-	case TAMPERE:
-		drawAlignedText("Tampere", 10, 240, 16, NOBACKCOLOR);
-	case ARNHEM:
-		drawAlignedText("Arnhem", 10, 240, 16, NOBACKCOLOR);
-	case SYDNEY:
-		drawAlignedText("Sydney", 10, 240, 16, NOBACKCOLOR);
+		case NHATRANG:
+			drawAlignedText("Nha Trang", 10, 240, 16, NOBACKCOLOR);
+		case SAIGON:
+			drawAlignedText("Sai Gon", 10, 240, 16, NOBACKCOLOR);
+		case HANOI:
+			drawAlignedText("Ha Noi", 10, 240, 16, NOBACKCOLOR);
+		case TAMPERE:
+			drawAlignedText("Tampere", 10, 240, 16, NOBACKCOLOR);
+		case ARNHEM:
+			drawAlignedText("Arnhem", 10, 240, 16, NOBACKCOLOR);
+		case SYDNEY:
+			drawAlignedText("Sydney", 10, 240, 16, NOBACKCOLOR);
 	}
+}
+
+void gardenStateInterface()
+{
+	gardenState = 1;
+	menu = 0;
+	uint16_t color;
+	if (isDay == 0)
+	{
+		lcdDrawImage(0, 0, &imageNight);
+		color = COLOR_NAVY;
+		lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
+	}
+	else
+	{
+		lcdDrawImage(0, 0, &imageDay);
+		color = COLOR_CYAN;
+		lcdSetTextColor(COLOR_BLACK, COLOR_BLACK);
+	}
+	drawMenuIcon();
+	for (int y = 160; y < 320; y++)
+	{
+		for (int x = 0; x < 240; x++)
+		{
+			lcdDrawPixel(x, y, color);
+		}
+	}
+	lcdSetCursor(80, 110);
+	lcdPrintfNoBackColor("Humidity: %d%%", gardenHumidity);
+	lcdSetTextFont(&Font20);
+	lcdSetCursor(110, 90);
+	lcdPrintfNoBackColor("%d", gardenTemperature);
+	drawAlignedText("Currently in: Phu Nhuan", 10, 240, 16, NOBACKCOLOR);
 }
 
 void drawInterface()
 {
 	if (wifi == 1)
 	{
-
+		wifiMenu();
 	}
 	else if (weatherForecast == 1)
 	{
-		drawWeatherForecastInterface();
+		weatherForecastInterface();
 	}
 	else if (gardenState == 1)
 	{
-		drawGardenState();
+		gardenStateInterface();
 	}
 }
 
@@ -718,24 +733,24 @@ void sendAPIURL(uint16_t chooseCity)
 {
     switch(chooseCity)
     {
-    case NHATRANG:
-    	HAL_UART_Transmit(&huart1, (uint8_t*)nhaTrangURL, strlen(nhaTrangURL), HAL_MAX_DELAY);
-    	break;
-    case SAIGON:
-    	HAL_UART_Transmit(&huart1, (uint8_t*)saiGonURL, strlen(saiGonURL), HAL_MAX_DELAY);
-    	break;
-    case HANOI:
-    	HAL_UART_Transmit(&huart1, (uint8_t*)haNoiURL, strlen(haNoiURL), HAL_MAX_DELAY);
-    	break;
-    case TAMPERE:
-    	HAL_UART_Transmit(&huart1, (uint8_t*)tampereURL, strlen(tampereURL), HAL_MAX_DELAY);
-    	break;
-    case ARNHEM:
-    	HAL_UART_Transmit(&huart1, (uint8_t*)arnhemURL, strlen(arnhemURL), HAL_MAX_DELAY);
-    	break;
-    case SYDNEY:
-    	HAL_UART_Transmit(&huart1, (uint8_t*)sydneyURL, strlen(sydneyURL), HAL_MAX_DELAY);
-    	break;
+    	case NHATRANG:
+    		HAL_UART_Transmit(&huart1, (uint8_t*)nhaTrangURL, strlen(nhaTrangURL), HAL_MAX_DELAY);
+    		break;
+    	case SAIGON:
+    		HAL_UART_Transmit(&huart1, (uint8_t*)saiGonURL, strlen(saiGonURL), HAL_MAX_DELAY);
+    		break;
+    	case HANOI:
+    		HAL_UART_Transmit(&huart1, (uint8_t*)haNoiURL, strlen(haNoiURL), HAL_MAX_DELAY);
+    		break;
+    	case TAMPERE:
+    		HAL_UART_Transmit(&huart1, (uint8_t*)tampereURL, strlen(tampereURL), HAL_MAX_DELAY);
+    		break;
+    	case ARNHEM:
+    		HAL_UART_Transmit(&huart1, (uint8_t*)arnhemURL, strlen(arnhemURL), HAL_MAX_DELAY);
+    		break;
+    	case SYDNEY:
+    		HAL_UART_Transmit(&huart1, (uint8_t*)sydneyURL, strlen(sydneyURL), HAL_MAX_DELAY);
+    		break;
     }
 }
 
