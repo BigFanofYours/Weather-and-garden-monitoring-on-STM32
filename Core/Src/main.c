@@ -797,6 +797,23 @@ void processWeatherData(const char *jsonData)
         return;
     }
 
+    if(gardenState == 1)
+    {
+    	cJSON *gardenTemp = cJSON_GetObjectItem(root, "gardenTemperature");
+    	cJSON *gardenHumid = cJSON_GetObjectItem(root, "gardenHumidity");
+    	if (gardenTemp)
+    	{
+    		gardenTemperature = gardenTemp->valueint;
+    	}
+    	if (gardenHumid)
+    	{
+    		gardenHumidity = gardenHumid->valueint;
+    	}
+    	processComplete = 1;
+    	cJSON_Delete(root);
+    	return;
+    }
+
     cJSON *current = cJSON_GetObjectItem(root, "current");
     if (current)
     {
