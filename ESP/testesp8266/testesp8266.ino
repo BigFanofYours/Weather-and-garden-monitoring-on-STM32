@@ -8,6 +8,8 @@ const char* mqttServer = "test.mosquitto.org";
 const char* requestTopic = "esp/request";    
 const char* responseTopic = "esp/response";  
 
+bool messageReceived = false;
+
 WiFiClient wifiClient;
 HTTPClient http;
 PubSubClient client(wifiClient);
@@ -50,6 +52,7 @@ void loop()
 
 void callback(char* topic, byte* payload, unsigned int length) 
 {
+  messageReceived = true;
   String gardenStateInfo;
   for (int i = 0; i < length; i++) 
   {
@@ -84,15 +87,23 @@ String fetchWeatherData(String URL)
 
 void fetchGardenData()
 {
+  messageReceived = false;
   client.setServer(mqttServer, 1883);
   if (client.connect("RequesterESP")) 
   {
-    client.subscribe(responseTopic);
-    client.publish(requestTopic, "?");
-    unsigned long startTime = millis();
-    while (millis() - startTime < 5000)
+    client.subscribe(responseTopic, 1);
+    while (!messageReceived) 
     {
-      client.loop();
+      client.publish(requestTopic, "?");
+      unsigned long startTime = millis();
+      while (millis() - startTime < 2000) 
+      {
+        client.loop();
+        if (messageReceived)
+        {
+          break;
+        } 
+      }
     }
     client.disconnect();
   }

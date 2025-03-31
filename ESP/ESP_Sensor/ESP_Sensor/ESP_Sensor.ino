@@ -28,7 +28,7 @@ void setup()
   client.setCallback(callback);
   if (client.connect("SensorESP"))
   {
-    client.subscribe(requestTopic);
+    client.subscribe(requestTopic, 1);
   }
   dht.begin();
 }
