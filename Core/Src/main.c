@@ -113,7 +113,7 @@ static void MX_SPI2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void drawMenuIcon();
+void drawBackIcon();
 void wifiMenu();
 void weatherForecastMenu();
 void mainMenu();
@@ -422,12 +422,11 @@ static void MX_FSMC_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void drawMenuIcon()
+void drawBackIcon()
 {
-	lcdFillRoundRect(0, 0, 35, 23, 8, COLOR_WHITE);
-	lcdFillRoundRect(3, 4, 29, 3, 2, COLOR_BLACK);
-	lcdFillRoundRect(3, 10, 29, 3, 2, COLOR_BLACK);
-	lcdFillRoundRect(3, 16, 29, 3, 2, COLOR_BLACK);
+	lcdFillRoundRect(0, 0, 27, 23, 8, COLOR_WHITE);
+	lcdFillRect(10, 7, 13, 8, COLOR_BLACK);
+	lcdFillTriangle(1, 11, 13, 2, 13, 20, COLOR_BLACK);
 }
 
 void wifiMenu()
@@ -435,9 +434,10 @@ void wifiMenu()
 	lcdSetTextFont(&Font16);
 	lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
 	lcdFillRGB(COLOR_BLACK);
+	drawBackIcon();
 	wifi = 1;
 	menu = 0;
-	drawAlignedText("Choose a network", 0, 240, 16, NOBACKCOLOR);
+	drawAlignedText("Feature in development", 32, 240, 16, NOBACKCOLOR);
 }
 
 void weatherForecastMenu()
@@ -445,9 +445,10 @@ void weatherForecastMenu()
 	lcdSetTextFont(&Font16);
 	lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
 	lcdFillRGB(COLOR_BLACK);
+	drawBackIcon();
 	weatherForecast = 1;
 	menu = 0;
-	drawAlignedText("Choose a location", 0, 240, 16, NOBACKCOLOR);
+	drawAlignedText(" Choose a location", 0, 240, 16, NOBACKCOLOR);
 
 	lcdSetTextColor(COLOR_BLACK, COLOR_BLACK);
 	lcdFillRoundRect(0, 32, 240, 40, 10, COLOR_WHITE);
@@ -487,15 +488,15 @@ void mainMenu()
 	lcdFillRoundRect(0, 80, 240, 40, 10, COLOR_WHITE);
 	drawAlignedText("Weather forecast", 93, 240, 16, NOBACKCOLOR);
 
-	lcdFillRoundRect(0, 272, 240, 40, 10, COLOR_WHITE);
-	drawAlignedText("Show garden state ", 141, 240, 16, NOBACKCOLOR);
+	lcdFillRoundRect(0, 128, 240, 40, 10, COLOR_WHITE);
+	drawAlignedText("Show garden state", 141, 240, 16, NOBACKCOLOR);
 }
 
 void drawBufferScreen()
 {
 	menu = 0;
 	lcdFillRGB(COLOR_BLACK);
-	drawMenuIcon();
+	drawBackIcon();
 	lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
 	drawAlignedText("Fetching data", 160, 240, 16, NOBACKCOLOR);
 }
@@ -506,6 +507,10 @@ void checkCoordinates()
 	{
 		drawBufferScreen();
 		wifiMenu();
+	}
+	else if ((yCoordinates <= 23 && xCoordinates <= 35) && menu != 1)
+	{
+		mainMenu();
 	}
 	else if ((yCoordinates >= 80 && yCoordinates <= 120) && menu == 1)
 	{
@@ -599,7 +604,7 @@ void weatherForecastInterface()
 		color = COLOR_CYAN;
 		lcdSetTextColor(COLOR_BLACK, COLOR_BLACK);
 	}
-	drawMenuIcon();
+	drawBackIcon();
 
 	for (int y = 160; y < 320; y++)
 	{
@@ -681,7 +686,7 @@ void gardenStateInterface()
 		color = COLOR_CYAN;
 		lcdSetTextColor(COLOR_BLACK, COLOR_BLACK);
 	}
-	drawMenuIcon();
+	drawBackIcon();
 	for (int y = 160; y < 320; y++)
 	{
 		for (int x = 0; x < 240; x++)

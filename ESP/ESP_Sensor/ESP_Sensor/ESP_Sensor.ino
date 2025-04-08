@@ -48,7 +48,8 @@ void callback(char* topic, byte* payload, unsigned int length)
   for (int i = 0; i < length; i++) 
   {
     message += (char)payload[i];
-  } 
+  }
+
   if (message == "?") 
   {
     float temp = dht.readTemperature();
@@ -65,7 +66,7 @@ void reconnect()
     if (client.connect("SensorESP")) 
     {
       Serial.println("Connected to MQTT!");
-      client.subscribe(requestTopic);  // Listen for "?" requests
+      client.subscribe(requestTopic, 1);
     } 
     else 
     {
