@@ -84,6 +84,7 @@ uint8_t wifi = 0;
 uint8_t weatherForecast = 0;
 uint8_t gardenState = 0;
 uint8_t menu = 1;
+bool allowTouch = true;
 
 //Variables for weather data handling
 int weather[7];
@@ -176,6 +177,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  allowTouch = true;
 	  if(rxComplete)
 	  {
 		  rxComplete = 0;
@@ -191,7 +193,7 @@ int main(void)
 		  resetBuffer();
 		  HAL_UART_Receive_IT(&huart1, (uint8_t*)tempBuffer, 1);
 	  }
-	  HAL_Delay(1000);
+	  HAL_Delay(500);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -506,57 +508,58 @@ void checkCoordinates()
 	if ((yCoordinates >= 32 && yCoordinates <= 72) && menu == 1)
 	{
 		drawBufferScreen();
+		wifi = 1;
 		wifiMenu();
-	}
-	else if ((yCoordinates <= 23 && xCoordinates <= 35) && menu != 1)
-	{
-		mainMenu();
 	}
 	else if ((yCoordinates >= 80 && yCoordinates <= 120) && menu == 1)
 	{
 		weatherForecastMenu();
 	}
-	else if ((yCoordinates >= 272 && yCoordinates <= 312) && menu == 1)
+	else if ((yCoordinates >= 128 && yCoordinates <= 168) && menu == 1)
 	{
 		drawBufferScreen();
 		sendGardenStateRequest();
-		gardenStateInterface();
+		gardenState = 1;
+	}
+	else if ((yCoordinates <= 23 && xCoordinates <= 27) && menu != 1)
+	{
+		mainMenu();
 	}
 	else if ((yCoordinates >= 32 && yCoordinates <= 72) && weatherForecast == 1)
 	{
 		drawBufferScreen();
 		sendAPIURL(SAIGON);
-		currentCity = 1;
+		currentCity = SAIGON;
 	}
 	else if ((yCoordinates >= 80 && yCoordinates <= 120) && weatherForecast == 1)
 	{
 		drawBufferScreen();
 		sendAPIURL(NHATRANG);
-		currentCity = 0;
+		currentCity = NHATRANG;
 	}
 	else if ((yCoordinates >= 128 && yCoordinates <= 168) && weatherForecast == 1)
 	{
 		drawBufferScreen();
 		sendAPIURL(HANOI);
-		currentCity = 2;
+		currentCity = HANOI;
 	}
 	else if ((yCoordinates >= 176 && yCoordinates <= 216) && weatherForecast == 1)
 	{
 		drawBufferScreen();
 		sendAPIURL(TAMPERE);
-		currentCity = 3;
+		currentCity = TAMPERE;
 	}
 	else if ((yCoordinates >= 224 && yCoordinates <= 264) && weatherForecast == 1)
 	{
 		drawBufferScreen();
 		sendAPIURL(ARNHEM);
-		currentCity = 4;
+		currentCity = ARNHEM;
 	}
 	else if ((yCoordinates >= 272 && yCoordinates <= 312) && weatherForecast == 1)
 	{
 		drawBufferScreen();
 		sendAPIURL(SYDNEY);
-		currentCity = 5;
+		currentCity = SYDNEY;
 	}
 }
 
@@ -875,13 +878,14 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if (GPIO_Pin == T_IRQ_Pin)
 	{
-		if(XPT2046_TouchPressed())
+		if(XPT2046_TouchPressed() && allowTouch)
 		{
 			if(XPT2046_TouchGetCoordinates(&xCoordinates, &yCoordinates))
 			{
 				xCoordinates = 240 - xCoordinates;
 				yCoordinates = 320 - yCoordinates;
 				checkCoordinates();
+				allowTouch = false;
 			}
 		}
 	}
