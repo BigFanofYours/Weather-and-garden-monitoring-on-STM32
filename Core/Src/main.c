@@ -117,6 +117,7 @@ static void MX_SPI2_Init(void);
 void drawBackIcon();
 void wifiMenu();
 void weatherForecastMenu();
+void gardenStateMenu();
 void mainMenu();
 void drawBufferScreen();
 void checkCoordinates();
@@ -472,6 +473,36 @@ void weatherForecastMenu()
 	drawAlignedText("Sydney", 285, 240, 16, NOBACKCOLOR);
 }
 
+void gardenStateMenu()
+{
+	lcdSetTextFont(&Font16);
+	lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
+	lcdFillRGB(COLOR_BLACK);
+	drawBackIcon();
+	gardenState = 1;
+	menu = 0;
+	drawAlignedText(" Choose a garden", 0, 240, 16, NOBACKCOLOR);
+
+	lcdSetTextColor(COLOR_BLACK, COLOR_BLACK);
+	lcdFillRoundRect(0, 32, 240, 40, 10, COLOR_WHITE);
+	drawAlignedText("Phu Nhuan", 45, 240, 16, NOBACKCOLOR);
+
+	/*lcdFillRoundRect(0, 80, 240, 40, 10, COLOR_WHITE);
+	drawAlignedText("Nha Trang", 93, 240, 16, NOBACKCOLOR);
+
+	lcdFillRoundRect(0, 128, 240, 40, 10, COLOR_WHITE);
+	drawAlignedText("Ha Noi", 141, 240, 16, NOBACKCOLOR);
+
+	lcdFillRoundRect(0, 176, 240, 40, 10, COLOR_WHITE);
+	drawAlignedText("Tampere", 189, 240, 16, NOBACKCOLOR);
+
+	lcdFillRoundRect(0, 224, 240, 40, 10, COLOR_WHITE);
+	drawAlignedText("Arnhem", 237, 240, 16, NOBACKCOLOR);
+
+	lcdFillRoundRect(0, 272, 240, 40, 10, COLOR_WHITE);
+	drawAlignedText("Sydney", 285, 240, 16, NOBACKCOLOR);*/
+}
+
 void mainMenu()
 {
 	lcdSetTextFont(&Font16);
@@ -507,8 +538,6 @@ void checkCoordinates()
 {
 	if ((yCoordinates >= 32 && yCoordinates <= 72) && menu == 1)
 	{
-		drawBufferScreen();
-		wifi = 1;
 		wifiMenu();
 	}
 	else if ((yCoordinates >= 80 && yCoordinates <= 120) && menu == 1)
@@ -517,9 +546,7 @@ void checkCoordinates()
 	}
 	else if ((yCoordinates >= 128 && yCoordinates <= 168) && menu == 1)
 	{
-		drawBufferScreen();
-		sendGardenStateRequest();
-		gardenState = 1;
+		gardenStateMenu();
 	}
 	else if ((yCoordinates <= 23 && xCoordinates <= 27) && menu != 1)
 	{
@@ -560,6 +587,11 @@ void checkCoordinates()
 		drawBufferScreen();
 		sendAPIURL(SYDNEY);
 		currentCity = SYDNEY;
+	}
+	else if ((yCoordinates >= 32 && yCoordinates <= 72) && gardenState == 1)
+	{
+		drawBufferScreen();
+		sendGardenStateRequest();
 	}
 }
 
@@ -674,7 +706,6 @@ void weatherForecastInterface()
 
 void gardenStateInterface()
 {
-	gardenState = 1;
 	menu = 0;
 	uint16_t color;
 	if (isDay == 0)
