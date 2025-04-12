@@ -13,7 +13,7 @@
 ../Core/Src/main.c:537:6:checkCoordinates	34
 ../Core/Src/main.c:598:6:drawWeather	16
 ../Core/Src/main.c:626:6:weatherForecastInterface	10
-../Core/Src/main.c:707:6:gardenStateInterface	4
+../Core/Src/main.c:707:6:gardenStateInterface	6
 ../Core/Src/main.c:739:6:drawInterface	4
 ../Core/Src/main.c:755:6:reformatDate	3
 ../Core/Src/main.c:771:6:sendAPIURL	7

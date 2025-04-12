@@ -707,33 +707,33 @@ void weatherForecastInterface()
 void gardenStateInterface()
 {
 	menu = 0;
-	uint16_t color;
-	if (isDay == 0)
-	{
-		lcdDrawImage(0, 0, &imageNight);
-		color = COLOR_NAVY;
-		lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
-	}
-	else
-	{
-		lcdDrawImage(0, 0, &imageDay);
-		color = COLOR_CYAN;
-		lcdSetTextColor(COLOR_BLACK, COLOR_BLACK);
-	}
+	lcdDrawImage(0, 0, &imageDay);
+	lcdSetTextColor(COLOR_BLACK, COLOR_BLACK);
+
 	drawBackIcon();
 	for (int y = 160; y < 320; y++)
 	{
 		for (int x = 0; x < 240; x++)
 		{
-			lcdDrawPixel(x, y, color);
+			lcdDrawPixel(x, y, COLOR_CYAN);
 		}
 	}
 	lcdSetCursor(80, 110);
 	lcdPrintfNoBackColor("Humidity: %d%%", gardenHumidity);
+	drawAlignedText("Currently in: Phu Nhuan", 10, 240, 16, NOBACKCOLOR);
 	lcdSetTextFont(&Font20);
 	lcdSetCursor(110, 90);
 	lcdPrintfNoBackColor("%d", gardenTemperature);
-	drawAlignedText("Currently in: Phu Nhuan", 10, 240, 16, NOBACKCOLOR);
+	if (gardenHumidity <= 80 || gardenTemperature >= 30)
+	{
+		drawAlignedText("Please water your garden!", 240, 240, 16, NOBACKCOLOR);
+		if (gardenHumidity <= 80)
+		{
+			drawAlignedText("Problem: Low humidity", 270, 240, 16, NOBACKCOLOR);
+			return;
+		}
+		drawAlignedText("Problem: High temperature", 270, 240, 16, NOBACKCOLOR);
+	}
 }
 
 void drawInterface()

@@ -13,7 +13,7 @@
 ../Core/Src/main.c:537:6:checkCoordinates	8	static
 ../Core/Src/main.c:598:6:drawWeather	16	static
 ../Core/Src/main.c:626:6:weatherForecastInterface	32	static
-../Core/Src/main.c:707:6:gardenStateInterface	32	static
+../Core/Src/main.c:707:6:gardenStateInterface	24	static
 ../Core/Src/main.c:739:6:drawInterface	8	static
 ../Core/Src/main.c:755:6:reformatDate	24	static
 ../Core/Src/main.c:771:6:sendAPIURL	24	static

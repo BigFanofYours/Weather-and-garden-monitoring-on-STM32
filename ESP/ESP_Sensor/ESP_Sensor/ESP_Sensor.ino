@@ -52,9 +52,9 @@ void callback(char* topic, byte* payload, unsigned int length)
 
   if (message == "?") 
   {
-    float temp = dht.readTemperature();
-    float hum = dht.readHumidity();
-    String data = "{\"temperature\":" + String(temp) + ",\"humidity\":" + String(hum) + "}";
+    float gardenTemperature = dht.readTemperature();
+    float gardenHumidity = dht.readHumidity();
+    String data = "{\"gardenTemperature\":" + String(gardenTemperature) + ",\"gardenHumidity\":" + String(gardenHumidity) + "}";
     client.publish(responseTopic, data.c_str());
   }
 }
