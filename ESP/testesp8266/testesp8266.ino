@@ -38,7 +38,7 @@ void loop()
       Serial.println(weatherData + "!");
       receivedUART = "";
     }
-    else if (incomingChar == '?')
+    else if (incomingChar == '!')
     {
       fetchGardenData();
       receivedUART = "";

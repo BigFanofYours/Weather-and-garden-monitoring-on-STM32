@@ -11,7 +11,7 @@ const char* responseTopic = "esp/response";
 WiFiClient wifiClient;
 PubSubClient client(wifiClient);
 
-#define DHTPIN 2  
+#define DHTPIN D7  
 #define DHTTYPE DHT22
 DHT dht(DHTPIN, DHTTYPE);
 

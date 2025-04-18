@@ -70,7 +70,7 @@ const char* arnhemURL = "http://api.open-meteo.com/v1/forecast?latitude=51.98&lo
 const char* sydneyURL = "http://api.open-meteo.com/v1/forecast?latitude=-33.8678&longitude=151.2073&current=temperature_2m,relative_humidity_2m,is_day&daily=weather_code&timezone=auto\r\n";
 
 //Request for garden info
-const char* requestGardenInfo = "?";
+const char* requestGardenInfo = "!";
 
 //Variables for handling received UART data
 uint8_t tempBuffer[1];
@@ -129,9 +129,10 @@ void reformatDate();
 void sendAPIURL(uint16_t chooseCity);
 void sendGardenStateRequest();
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
-void processWeatherData(const char *jsonData);
+void processData(const char *jsonData);
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 void resetBuffer();
+void resetWiFiPassword();
 /* USER CODE END 0 */
 
 /**
@@ -183,7 +184,7 @@ int main(void)
 	  {
 		  rxComplete = 0;
 		  rxIndex = 0;
-		  processWeatherData((const char*) rxBuffer);
+		  processData((const char*) rxBuffer);
 		  if (processComplete)
 		  {
 			  processComplete = 0;
@@ -691,16 +692,22 @@ void weatherForecastInterface()
 	{
 		case NHATRANG:
 			drawAlignedText("Nha Trang", 10, 240, 16, NOBACKCOLOR);
+			break;
 		case SAIGON:
 			drawAlignedText("Sai Gon", 10, 240, 16, NOBACKCOLOR);
+			break;
 		case HANOI:
 			drawAlignedText("Ha Noi", 10, 240, 16, NOBACKCOLOR);
+			break;
 		case TAMPERE:
 			drawAlignedText("Tampere", 10, 240, 16, NOBACKCOLOR);
+			break;
 		case ARNHEM:
 			drawAlignedText("Arnhem", 10, 240, 16, NOBACKCOLOR);
+			break;
 		case SYDNEY:
 			drawAlignedText("Sydney", 10, 240, 16, NOBACKCOLOR);
+			break;
 	}
 }
 
@@ -825,7 +832,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	HAL_UART_Receive_IT(&huart1, (uint8_t*)tempBuffer, 1);
 }
 
-void processWeatherData(const char *jsonData)
+void processData(const char *jsonData)
 {
     cJSON *root = cJSON_Parse(jsonData);
     if (root == NULL)
@@ -928,6 +935,12 @@ void resetBuffer()
 	{
 		rxBuffer[i] = 0;
 	}
+}
+
+void resetWiFiPassword()
+{
+	/*passwordIndex = 0;
+	password[0] = '\0';*/
 }
 /* USER CODE END 4 */
 
