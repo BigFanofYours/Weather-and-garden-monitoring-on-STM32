@@ -46,6 +46,7 @@
 #define TAMPERE 3
 #define ARNHEM 4
 #define SYDNEY 5
+#define MAX_PASSWORD_LENGTH 32
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -82,6 +83,7 @@ uint8_t rxComplete = 0;
 uint16_t xCoordinates = 0, yCoordinates = 0;
 uint8_t wifi = 0;
 uint8_t weatherForecast = 0;
+uint8_t showWeather = 0;
 uint8_t gardenState = 0;
 uint8_t menu = 1;
 bool allowTouch = true;
@@ -96,6 +98,16 @@ uint16_t dateIndex = 0;
 uint8_t processComplete = 0;
 uint8_t isDay = 0;
 char* date[7];
+
+//Variables for wifi menu
+uint8_t passwordIndex = 0;
+const char* keyMap[] =
+{
+	"1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+	"Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P",
+    "A", "S", "D", "F", "G", "H", "J", "K", "L", "<-",
+    "Z", "X", "C", "V", "B", "N", "M", "^", "Reset"
+};
 
 //Variables for garden state
 int gardenTemperature = 0;
@@ -115,6 +127,7 @@ static void MX_SPI2_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 void drawBackIcon();
+void drawKeyboard();
 void wifiMenu();
 void weatherForecastMenu();
 void gardenStateMenu();
@@ -433,15 +446,55 @@ void drawBackIcon()
 	lcdFillTriangle(1, 11, 13, 2, 13, 20, COLOR_BLACK);
 }
 
+void drawKeyboard()
+{
+	lcdSetTextFont(&Font12);
+	lcdSetTextColor(COLOR_BLACK, COLOR_BLACK);
+	for (int y = 200; y < 320; y++)
+	{
+		for (int x = 0; x < 240; x++)
+		{
+			lcdDrawPixel(x, y, COLOR_WHITE);
+		}
+	}
+	int x0 = 0, y0 = 200;
+    int buttonWidth = 24, buttonHeight = 30;
+    int column = 0, row = 0;
+
+    for (int i = 0; i < sizeof(keyMap) / sizeof(keyMap[0]); i++)
+    {
+        int x = x0 + column * buttonWidth;
+        int y = y0 + row * buttonHeight;
+        lcdSetCursor(x + 8, y + 10);
+        lcdPrintfNoBackColor((char*)keyMap[i]);
+
+        column++;
+        if (column == 10)
+        {
+            column = 0;
+            row++;
+        }
+    }
+    lcdDrawLine(0, 230, 240, 230, COLOR_BLACK);
+    lcdDrawLine(0, 260, 240, 260, COLOR_BLACK);
+    lcdDrawLine(0, 290, 240, 290, COLOR_BLACK);
+    lcdDrawLine(0, 200, 240, 200, COLOR_BLACK);
+    for (int i = 1; i <= 8; i++)
+    {
+    	int x = x0 + i * buttonWidth;
+    	lcdDrawLine(x, 200, x, 320, COLOR_BLACK);
+    }
+    lcdDrawLine(216, 200, 216, 290, COLOR_BLACK);
+    lcdDrawLine(239, 230, 239, 320, COLOR_BLACK);
+}
+
 void wifiMenu()
 {
-	lcdSetTextFont(&Font16);
-	lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
 	lcdFillRGB(COLOR_BLACK);
 	drawBackIcon();
 	wifi = 1;
 	menu = 0;
-	drawAlignedText("Feature in development", 32, 240, 16, NOBACKCOLOR);
+	drawKeyboard();
 }
 
 void weatherForecastMenu()
@@ -541,7 +594,7 @@ void checkCoordinates()
 	{
 		wifiMenu();
 	}
-	else if ((yCoordinates >= 80 && yCoordinates <= 120) && menu == 1)
+	else if ((yCoordinates >= 80 && yCoordinates <= 120) && (menu == 1 || showWeather == 1))
 	{
 		weatherForecastMenu();
 	}
@@ -589,6 +642,7 @@ void checkCoordinates()
 		sendAPIURL(SYDNEY);
 		currentCity = SYDNEY;
 	}
+
 	else if ((yCoordinates >= 32 && yCoordinates <= 72) && gardenState == 1)
 	{
 		drawBufferScreen();
@@ -626,7 +680,7 @@ void drawWeather(uint16_t xPosition, uint16_t yPosition, int weatherCode)
 
 void weatherForecastInterface()
 {
-	menu = 0;
+	showWeather = 1;
 	uint16_t color;
 	if (isDay == 0)
 	{
