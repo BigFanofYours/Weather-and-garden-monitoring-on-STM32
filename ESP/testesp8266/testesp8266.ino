@@ -1,6 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <PubSubClient.h>
+#include <ArduinoJson.h>
 
 const char* ssid = "1";
 const char* password = "25102004";
@@ -41,6 +42,11 @@ void loop()
     else if (incomingChar == '!')
     {
       fetchGardenData();
+      receivedUART = "";
+    }
+    else if (incomingChar == '#')  
+    {
+      scanAndSendNetworks();
       receivedUART = "";
     }
     else 
@@ -107,4 +113,21 @@ void fetchGardenData()
     }
     client.disconnect();
   }
+}
+
+void scanAndSendNetworks() 
+{
+  int numOfNetworks = WiFi.scanNetworks();
+  StaticJsonDocument<1024> doc;
+  JsonArray networks = doc.createNestedArray("networks");
+
+  for (int i = 0; i < numOfNetworks; ++i) 
+  {
+    JsonObject net = networks.createNestedObject();
+    net["ssid"] = WiFi.SSID(i);
+    net["secure"] = (WiFi.encryptionType(i) != ENC_TYPE_NONE);
+  }
+
+  serializeJson(doc, Serial);
+  Serial.println();  
 }
