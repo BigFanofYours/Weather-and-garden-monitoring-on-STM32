@@ -100,14 +100,20 @@ uint8_t isDay = 0;
 char* date[7];
 
 //Variables for wifi menu
+char wifiPassword[MAX_PASSWORD_LENGTH + 1] = {0};
 uint8_t passwordIndex = 0;
 const char* keyMap[] =
 {
 	"1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
-	"Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P",
-    "A", "S", "D", "F", "G", "H", "J", "K", "L", "<-",
-    "Z", "X", "C", "V", "B", "N", "M", "^", "Reset"
+	"q", "w", "e", "r", "t", "y", "u", "i", "o", "p",
+    "a", "s", "d", "f", "g", "h", "j", "k", "l", "<-",
+    "z", "x", "c", "v", "b", "n", "m", "^", "Del", "Del"
 };
+bool keyboardShift = false;
+const uint16_t keyboardX0 = 0;
+const uint16_t keyboardY0 = 200;
+const uint16_t keyboardButtonWidth = 24;
+const uint16_t keyboardButtonHeight = 30;
 
 //Variables for garden state
 int gardenTemperature = 0;
@@ -128,6 +134,8 @@ static void MX_SPI2_Init(void);
 /* USER CODE BEGIN 0 */
 void drawBackIcon();
 void drawKeyboard();
+char applyShift(char character);
+void handleKeyboardTouch();
 void wifiMenu();
 void weatherForecastMenu();
 void gardenStateMenu();
@@ -457,14 +465,12 @@ void drawKeyboard()
 			lcdDrawPixel(x, y, COLOR_WHITE);
 		}
 	}
-	int x0 = 0, y0 = 200;
-    int buttonWidth = 24, buttonHeight = 30;
     int column = 0, row = 0;
 
-    for (int i = 0; i < sizeof(keyMap) / sizeof(keyMap[0]); i++)
+    for (int i = 0; i < (sizeof(keyMap) / sizeof(keyMap[0])) - 1; i++)
     {
-        int x = x0 + column * buttonWidth;
-        int y = y0 + row * buttonHeight;
+    	int x = keyboardX0 + column * keyboardButtonWidth;
+    	int y = keyboardY0 + row * keyboardButtonHeight;
         lcdSetCursor(x + 8, y + 10);
         lcdPrintfNoBackColor((char*)keyMap[i]);
 
@@ -481,11 +487,67 @@ void drawKeyboard()
     lcdDrawLine(0, 200, 240, 200, COLOR_BLACK);
     for (int i = 1; i <= 8; i++)
     {
-    	int x = x0 + i * buttonWidth;
+    	int x = keyboardX0 + i * keyboardButtonWidth;
     	lcdDrawLine(x, 200, x, 320, COLOR_BLACK);
     }
     lcdDrawLine(216, 200, 216, 290, COLOR_BLACK);
     lcdDrawLine(239, 230, 239, 320, COLOR_BLACK);
+}
+
+char applyShift(char character)
+{
+    if (character >= 'a' && character <= 'z')
+    {
+        return character - ('a' - 'A');
+    }
+    return character;
+}
+
+void handleKeyboardTouch()
+{
+	if ((yCoordinates <= 23 && xCoordinates <= 27) && menu != 1)
+	{
+		mainMenu();
+		return;
+	}
+	lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
+	uint8_t column = (xCoordinates - keyboardX0) / keyboardButtonWidth;
+	if (xCoordinates == 240)
+	{
+		column = (xCoordinates - keyboardX0 - 1) / keyboardButtonWidth;
+	}
+    uint8_t row = (yCoordinates - keyboardY0) / keyboardButtonHeight;
+    uint8_t keyIndex = row * 10 + column;
+    if (keyIndex >= sizeof(keyMap) / sizeof(keyMap[0])) return;
+
+    const char* key = keyMap[keyIndex];
+    if (strcmp(key, "Del") == 0)
+    {
+    	if (passwordIndex > 0)
+    	{
+    		passwordIndex--;
+    		wifiPassword[passwordIndex] = '\0';
+    	}
+    }
+    else if (strcmp(key, "^") == 0)
+    {
+        keyboardShift = !keyboardShift;
+    }
+    else if (strcmp(key, "<-") == 0)
+    {
+    	//HAL_UART_Transmit(&huart1, (uint8_t*)wifiPassword, strlen(wifiPassword), HAL_MAX_DELAY);
+    }
+    else if (passwordIndex <= MAX_PASSWORD_LENGTH)
+    {
+    	char character = key[0];
+    	if (keyboardShift)
+    	{
+    	    character = applyShift(character);
+    	}
+    	wifiPassword[passwordIndex++] = character;
+    	wifiPassword[passwordIndex] = '\0';
+    }
+    lcdPrintf(wifiPassword);
 }
 
 void wifiMenu()
@@ -495,6 +557,7 @@ void wifiMenu()
 	wifi = 1;
 	menu = 0;
 	drawKeyboard();
+	lcdSetCursor(0, 40);
 }
 
 void weatherForecastMenu()
@@ -968,19 +1031,23 @@ void processData(const char *jsonData)
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	if (GPIO_Pin == T_IRQ_Pin)
+	if (GPIO_Pin != T_IRQ_Pin) return;
+
+	if (!XPT2046_TouchPressed() || !allowTouch) return;
+
+	if (!XPT2046_TouchGetCoordinates(&xCoordinates, &yCoordinates)) return;
+
+	xCoordinates = 240 - xCoordinates;
+	yCoordinates = 320 - yCoordinates;
+	if (wifi == 1)
 	{
-		if(XPT2046_TouchPressed() && allowTouch)
-		{
-			if(XPT2046_TouchGetCoordinates(&xCoordinates, &yCoordinates))
-			{
-				xCoordinates = 240 - xCoordinates;
-				yCoordinates = 320 - yCoordinates;
-				checkCoordinates();
-				allowTouch = false;
-			}
-		}
+		handleKeyboardTouch();
 	}
+	else
+	{
+		checkCoordinates();
+	}
+	allowTouch = false;
 }
 
 void resetBuffer()
