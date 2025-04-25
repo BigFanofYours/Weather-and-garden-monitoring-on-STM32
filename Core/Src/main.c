@@ -47,6 +47,8 @@
 #define ARNHEM 4
 #define SYDNEY 5
 #define MAX_PASSWORD_LENGTH 32
+#define MAX_NETWORKS 5
+#define MAX_SSID_LENGTH 32
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -99,7 +101,17 @@ uint8_t processComplete = 0;
 uint8_t isDay = 0;
 char* date[7];
 
+//Request for wifi info
+const char* requestWifiInfo = "#";
+
 //Variables for wifi menu
+typedef struct
+{
+    char ssid[MAX_SSID_LENGTH];
+    int secure;
+} WiFiNetwork;
+WiFiNetwork networkList[MAX_NETWORKS];
+int networkCount = 0;
 char wifiPassword[MAX_PASSWORD_LENGTH + 1] = {0};
 uint8_t passwordIndex = 0;
 const char* keyMap[] =
@@ -149,11 +161,11 @@ void drawInterface();
 void reformatDate();
 void sendAPIURL(uint16_t chooseCity);
 void sendGardenStateRequest();
+void sendWifiRequest();
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 void processData(const char *jsonData);
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 void resetBuffer();
-void resetWiFiPassword();
 /* USER CODE END 0 */
 
 /**
@@ -547,6 +559,7 @@ void handleKeyboardTouch()
     	wifiPassword[passwordIndex++] = character;
     	wifiPassword[passwordIndex] = '\0';
     }
+    lcdSetCursor(0, 180);
     lcdPrintf(wifiPassword);
 }
 
@@ -557,7 +570,6 @@ void wifiMenu()
 	wifi = 1;
 	menu = 0;
 	drawKeyboard();
-	lcdSetCursor(0, 40);
 }
 
 void weatherForecastMenu()
@@ -655,7 +667,8 @@ void checkCoordinates()
 {
 	if ((yCoordinates >= 32 && yCoordinates <= 72) && menu == 1)
 	{
-		wifiMenu();
+		drawBufferScreen();
+		sendWifiRequest();
 	}
 	else if ((yCoordinates >= 80 && yCoordinates <= 120) && (menu == 1 || showWeather == 1))
 	{
@@ -922,6 +935,11 @@ void sendGardenStateRequest()
 	HAL_UART_Transmit(&huart1, (uint8_t*)requestGardenInfo, strlen(requestGardenInfo), HAL_MAX_DELAY);
 }
 
+void sendWifiRequest()
+{
+	HAL_UART_Transmit(&huart1, (uint8_t*)requestWifiInfo, strlen(requestWifiInfo), HAL_MAX_DELAY);
+}
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if (rxIndex < BUFFER_SIZE - 1)
@@ -975,6 +993,32 @@ void processData(const char *jsonData)
     	processComplete = 1;
     	cJSON_Delete(root);
     	return;
+    }
+    else if (wifi == 1)
+    {
+    	cJSON *networks = cJSON_GetObjectItem(root, "networks");
+    	int networkIndex = 0;
+    	cJSON *item = NULL;
+    	cJSON_ArrayForEach(item, networks)
+    	{
+    	    if (networkIndex >= MAX_NETWORKS) break;
+
+    	    cJSON *ssid = cJSON_GetObjectItem(item, "ssid");
+    	    cJSON *secure = cJSON_GetObjectItem(item, "secure");
+
+    	    if (cJSON_IsString(ssid) && cJSON_IsBool(secure))
+    	    {
+    	        strncpy(networkList[networkIndex].ssid, ssid->valuestring, MAX_SSID_LENGTH - 1);
+    	        networkList[networkIndex].ssid[MAX_SSID_LENGTH - 1] = '\0';
+    	        networkList[networkIndex].secure = cJSON_IsTrue(secure);
+    	        networkIndex++;
+    	    }
+    	}
+
+    	networkCount = networkIndex;
+    	processComplete = 1;
+    	cJSON_Delete(root);
+        return;
     }
 
     cJSON *current = cJSON_GetObjectItem(root, "current");
@@ -1056,12 +1100,6 @@ void resetBuffer()
 	{
 		rxBuffer[i] = 0;
 	}
-}
-
-void resetWiFiPassword()
-{
-	/*passwordIndex = 0;
-	password[0] = '\0';*/
 }
 /* USER CODE END 4 */
 
