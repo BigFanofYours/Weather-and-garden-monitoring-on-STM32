@@ -129,5 +129,5 @@ void scanAndSendNetworks()
   }
 
   serializeJson(doc, Serial);
-  Serial.println();  
+  Serial.println("!");  
 }

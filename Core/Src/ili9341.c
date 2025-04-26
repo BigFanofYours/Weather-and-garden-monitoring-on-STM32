@@ -347,7 +347,7 @@ int getTextWidth(const char *text, int size)
     int characterWidth;
 	if (size == 12)
     {
-    	characterWidth = 6;
+    	characterWidth = 7;
     }
     else
     {

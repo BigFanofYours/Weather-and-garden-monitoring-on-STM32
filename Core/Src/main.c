@@ -47,7 +47,7 @@
 #define ARNHEM 4
 #define SYDNEY 5
 #define MAX_PASSWORD_LENGTH 32
-#define MAX_NETWORKS 5
+#define MAX_NETWORKS 10
 #define MAX_SSID_LENGTH 32
 /* USER CODE END PD */
 
@@ -87,6 +87,7 @@ uint8_t wifi = 0;
 uint8_t weatherForecast = 0;
 uint8_t showWeather = 0;
 uint8_t gardenState = 0;
+uint8_t showGardenState = 0;
 uint8_t menu = 1;
 bool allowTouch = true;
 
@@ -570,6 +571,12 @@ void wifiMenu()
 	wifi = 1;
 	menu = 0;
 	drawKeyboard();
+	lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
+	for (int i = 0; i < networkCount; i++)
+	{
+		lcdSetCursor(0, 20 * i);
+		lcdPrintf((const char*)networkList[i].ssid);
+	}
 }
 
 void weatherForecastMenu()
@@ -579,6 +586,7 @@ void weatherForecastMenu()
 	lcdFillRGB(COLOR_BLACK);
 	drawBackIcon();
 	weatherForecast = 1;
+	showWeather = 0;
 	menu = 0;
 	drawAlignedText(" Choose a location", 0, 240, 16, NOBACKCOLOR);
 
@@ -609,27 +617,13 @@ void gardenStateMenu()
 	lcdFillRGB(COLOR_BLACK);
 	drawBackIcon();
 	gardenState = 1;
+	showGardenState = 0;
 	menu = 0;
 	drawAlignedText(" Choose a garden", 0, 240, 16, NOBACKCOLOR);
 
 	lcdSetTextColor(COLOR_BLACK, COLOR_BLACK);
 	lcdFillRoundRect(0, 32, 240, 40, 10, COLOR_WHITE);
 	drawAlignedText("Phu Nhuan", 45, 240, 16, NOBACKCOLOR);
-
-	/*lcdFillRoundRect(0, 80, 240, 40, 10, COLOR_WHITE);
-	drawAlignedText("Nha Trang", 93, 240, 16, NOBACKCOLOR);
-
-	lcdFillRoundRect(0, 128, 240, 40, 10, COLOR_WHITE);
-	drawAlignedText("Ha Noi", 141, 240, 16, NOBACKCOLOR);
-
-	lcdFillRoundRect(0, 176, 240, 40, 10, COLOR_WHITE);
-	drawAlignedText("Tampere", 189, 240, 16, NOBACKCOLOR);
-
-	lcdFillRoundRect(0, 224, 240, 40, 10, COLOR_WHITE);
-	drawAlignedText("Arnhem", 237, 240, 16, NOBACKCOLOR);
-
-	lcdFillRoundRect(0, 272, 240, 40, 10, COLOR_WHITE);
-	drawAlignedText("Sydney", 285, 240, 16, NOBACKCOLOR);*/
 }
 
 void mainMenu()
@@ -669,12 +663,13 @@ void checkCoordinates()
 	{
 		drawBufferScreen();
 		sendWifiRequest();
+		wifi = 1;
 	}
-	else if ((yCoordinates >= 80 && yCoordinates <= 120) && (menu == 1 || showWeather == 1))
+	else if ((yCoordinates >= 80 && yCoordinates <= 120 && menu == 1) || (yCoordinates <= 23 && xCoordinates <= 27 && showWeather == 1))
 	{
 		weatherForecastMenu();
 	}
-	else if ((yCoordinates >= 128 && yCoordinates <= 168) && menu == 1)
+	else if ((yCoordinates >= 128 && yCoordinates <= 168 && menu == 1) || (yCoordinates <= 23 && xCoordinates <= 27 && showGardenState == 1))
 	{
 		gardenStateMenu();
 	}
@@ -843,10 +838,9 @@ void weatherForecastInterface()
 
 void gardenStateInterface()
 {
-	menu = 0;
+	showGardenState = 1;
 	lcdDrawImage(0, 0, &imageDay);
 	lcdSetTextColor(COLOR_BLACK, COLOR_BLACK);
-
 	drawBackIcon();
 	for (int y = 160; y < 320; y++)
 	{
@@ -855,21 +849,22 @@ void gardenStateInterface()
 			lcdDrawPixel(x, y, COLOR_CYAN);
 		}
 	}
-	lcdSetCursor(80, 110);
-	lcdPrintfNoBackColor("Humidity: %d%%", gardenHumidity);
-	drawAlignedText("Currently in: Phu Nhuan", 10, 240, 16, NOBACKCOLOR);
 	lcdSetTextFont(&Font20);
 	lcdSetCursor(110, 90);
 	lcdPrintfNoBackColor("%d", gardenTemperature);
+	lcdSetTextFont(&Font12);
+	lcdSetCursor(80, 110);
+	lcdPrintfNoBackColor("Humidity: %d%%", gardenHumidity);
+	drawAlignedText("Currently in: Phu Nhuan", 10, 240, 12, NOBACKCOLOR);
 	if (gardenHumidity <= 80 || gardenTemperature >= 30)
 	{
-		drawAlignedText("Please water your garden!", 240, 240, 16, NOBACKCOLOR);
+		drawAlignedText("Please water your garden!", 240, 240, 12, NOBACKCOLOR);
 		if (gardenHumidity <= 80)
 		{
-			drawAlignedText("Problem: Low humidity", 270, 240, 16, NOBACKCOLOR);
+			drawAlignedText("Problem: Low humidity", 270, 240, 12, NOBACKCOLOR);
 			return;
 		}
-		drawAlignedText("Problem: High temperature", 270, 240, 16, NOBACKCOLOR);
+		drawAlignedText("Problem: High temperature", 270, 240, 12, NOBACKCOLOR);
 	}
 }
 
