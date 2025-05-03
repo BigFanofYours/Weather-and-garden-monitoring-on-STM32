@@ -62,7 +62,7 @@ void callback(char* topic, byte* payload, unsigned int length)
   String gardenStateInfo;
   for (int i = 0; i < length; i++) 
   {
-   gardenStateInfo += (char)payload[i];
+    gardenStateInfo += (char)payload[i];
   }
   Serial.println(gardenStateInfo + "!");
 }

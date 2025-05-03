@@ -47,7 +47,7 @@
 #define ARNHEM 4
 #define SYDNEY 5
 #define MAX_PASSWORD_LENGTH 32
-#define MAX_NETWORKS 10
+#define MAX_NETWORKS 12
 #define MAX_SSID_LENGTH 32
 /* USER CODE END PD */
 
@@ -571,11 +571,14 @@ void wifiMenu()
 	wifi = 1;
 	menu = 0;
 	drawKeyboard();
-	lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
-	for (int i = 0; i < networkCount; i++)
+	for (int i = 0; i < networkCount / 2; i++)
 	{
-		lcdSetCursor(0, 20 * i);
-		lcdPrintf((const char*)networkList[i].ssid);
+		lcdFillRoundRect(0, 25 + 29 * i, 115, 25, 10, COLOR_WHITE);
+		lcdSetCursor(2, 33 + 29 * i);
+		lcdPrintfNoBackColor((const char*)networkList[i].ssid);
+		lcdFillRoundRect(120, 25 + 29 * i, 120, 25, 10, COLOR_WHITE);
+		lcdSetCursor(122, 33 + 29 * i);
+		lcdPrintfNoBackColor((const char*)networkList[i + 6].ssid);
 	}
 }
 
@@ -1091,7 +1094,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 void resetBuffer()
 {
-	for (int i = 0; i < sizeof(rxBuffer); i++)
+	for (int i = 0; i <= BUFFER_SIZE; i++)
 	{
 		rxBuffer[i] = 0;
 	}
