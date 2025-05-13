@@ -3,8 +3,8 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 
-const char* ssid = "1";
-const char* password = "25102004";
+char ssid[32] = "1";
+char password[32] = "25102004";
 const char* mqttServer = "test.mosquitto.org";
 const char* requestTopic = "esp/request";    
 const char* responseTopic = "esp/response";  
@@ -49,10 +49,55 @@ void loop()
       scanAndSendNetworks();
       receivedUART = "";
     }
+    else if (incomingChar == '+') 
+    {
+      processWiFiConfig(receivedUART);
+      receivedUART = "";
+    }
     else 
     {
       receivedUART += incomingChar;
     }
+  }
+}
+
+void connectToWiFi() 
+{
+  WiFi.begin(ssid, password);
+  int retries = 0;
+  while (WiFi.status() != WL_CONNECTED && retries < 10) 
+  {
+    delay(500);
+    retries++;
+  }
+}
+
+void processWiFiConfig(String jsonString)
+{
+  StaticJsonDocument<200> doc;
+  DeserializationError error = deserializeJson(doc, jsonString);
+
+  if (!error) 
+  {
+    const char* newSSID = doc["ssid"];
+    const char* newPassword = doc["password"];
+
+    if (newSSID && newPassword) 
+    {
+      memset(ssid, 0, sizeof(ssid));
+      strncpy(ssid, newSSID, sizeof(ssid));
+      ssid[sizeof(ssid) - 1] = '\0';
+      memset(password, 0, sizeof(password));
+      strncpy(password, newPassword, sizeof(password));
+      password[sizeof(password) - 1] = '\0';
+      WiFi.disconnect();
+      delay(1000);
+      connectToWiFi();
+    }
+  } 
+  else 
+  {
+    Serial.println("{}?");
   }
 }
 

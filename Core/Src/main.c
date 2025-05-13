@@ -27,6 +27,7 @@
 #include <cJSON.h>
 #include <string.h>
 #include "XPT2046_touch.h"
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -83,7 +84,8 @@ uint8_t rxComplete = 0;
 
 //Variables for switching between UIs
 uint16_t xCoordinates = 0, yCoordinates = 0;
-uint8_t wifi = 0;
+uint8_t wifiList = 0;
+uint8_t wifiConnect = 0;
 uint8_t weatherForecast = 0;
 uint8_t showWeather = 0;
 uint8_t gardenState = 0;
@@ -114,6 +116,8 @@ typedef struct
 WiFiNetwork networkList[MAX_NETWORKS];
 int networkCount = 0;
 char wifiPassword[MAX_PASSWORD_LENGTH + 1] = {0};
+char selectedSSID[MAX_SSID_LENGTH];
+char wifiConnectionInfo[100];
 uint8_t passwordIndex = 0;
 const char* keyMap[] =
 {
@@ -149,7 +153,9 @@ void drawBackIcon();
 void drawKeyboard();
 char applyShift(char character);
 void handleKeyboardTouch();
+void handleWifiListTouch();
 void wifiMenu();
+void connectToWifi();
 void weatherForecastMenu();
 void gardenStateMenu();
 void mainMenu();
@@ -518,9 +524,9 @@ char applyShift(char character)
 
 void handleKeyboardTouch()
 {
-	if ((yCoordinates <= 23 && xCoordinates <= 27) && menu != 1)
+	if ((yCoordinates <= 23 && xCoordinates <= 27) && wifiConnect == 1)
 	{
-		mainMenu();
+		wifiMenu();
 		return;
 	}
 	lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
@@ -548,7 +554,9 @@ void handleKeyboardTouch()
     }
     else if (strcmp(key, "<-") == 0)
     {
-    	//HAL_UART_Transmit(&huart1, (uint8_t*)wifiPassword, strlen(wifiPassword), HAL_MAX_DELAY);
+    	sprintf(wifiConnectionInfo, "{\"ssid\":\"%s\", \"password\":\"%s\"}+", selectedSSID, wifiPassword);
+    	HAL_UART_Transmit(&huart1, (uint8_t*)wifiConnectionInfo, strlen(wifiConnectionInfo), HAL_MAX_DELAY);
+    	passwordIndex = 0;
     }
     else if (passwordIndex <= MAX_PASSWORD_LENGTH)
     {
@@ -564,22 +572,50 @@ void handleKeyboardTouch()
     lcdPrintf(wifiPassword);
 }
 
+void handleWifiListTouch()
+{
+	if ((yCoordinates <= 23 && xCoordinates <= 27) && wifiList == 1)
+	{
+		mainMenu();
+		return;
+	}
+	uint8_t column = xCoordinates / 120;
+	uint8_t row = (yCoordinates - 25) / 50;
+	strncpy(selectedSSID, networkList[row + column * 6].ssid, MAX_SSID_LENGTH - 1);
+	selectedSSID[MAX_SSID_LENGTH - 1] = '\0';
+	connectToWifi();
+}
+
 void wifiMenu()
 {
 	lcdFillRGB(COLOR_BLACK);
+	lcdSetTextColor(COLOR_BLACK, COLOR_BLACK);
+	lcdSetTextFont(&Font12);
 	drawBackIcon();
-	wifi = 1;
+	wifiList = 1;
+	wifiConnect = 0;
 	menu = 0;
-	drawKeyboard();
 	for (int i = 0; i < networkCount / 2; i++)
 	{
-		lcdFillRoundRect(0, 25 + 29 * i, 115, 25, 10, COLOR_WHITE);
-		lcdSetCursor(2, 33 + 29 * i);
-		lcdPrintfNoBackColor((const char*)networkList[i].ssid);
-		lcdFillRoundRect(120, 25 + 29 * i, 120, 25, 10, COLOR_WHITE);
-		lcdSetCursor(122, 33 + 29 * i);
-		lcdPrintfNoBackColor((const char*)networkList[i + 6].ssid);
+		lcdFillRoundRect(0, 25 + 50 * i, 118, 45, 10, COLOR_WHITE);
+		drawAlignedText(networkList[i].ssid, 45 + 50 * i, 120, 12, NOBACKCOLOR);
+		lcdFillRoundRect(120, 25 + 50 * i, 122, 45, 10, COLOR_WHITE);
+		drawAlignedText(networkList[i + 6].ssid, 45 + 50 * i, 360, 12, NOBACKCOLOR);
 	}
+	memset(selectedSSID, 0, sizeof(selectedSSID));
+	memset(wifiPassword, 0, sizeof(wifiPassword));
+	memset(wifiConnectionInfo, 0, sizeof(wifiConnectionInfo));
+}
+
+void connectToWifi()
+{
+	lcdFillRGB(COLOR_BLACK);
+	drawKeyboard();
+	lcdSetTextColor(COLOR_WHITE, COLOR_BLACK);
+	drawBackIcon();
+	wifiList = 0;
+	wifiConnect = 1;
+	drawAlignedText(selectedSSID, 70, 240, 12, NOBACKCOLOR);
 }
 
 void weatherForecastMenu()
@@ -637,7 +673,7 @@ void mainMenu()
 	menu = 1;
 	gardenState = 0;
 	weatherForecast = 0;
-	wifi = 0;
+	wifiList = 0;
 	drawAlignedText("Choose an option", 0, 240, 16, NOBACKCOLOR);
 
 	lcdSetTextColor(COLOR_BLACK, COLOR_BLACK);
@@ -666,7 +702,7 @@ void checkCoordinates()
 	{
 		drawBufferScreen();
 		sendWifiRequest();
-		wifi = 1;
+		wifiList = 1;
 	}
 	else if ((yCoordinates >= 80 && yCoordinates <= 120 && menu == 1) || (yCoordinates <= 23 && xCoordinates <= 27 && showWeather == 1))
 	{
@@ -873,7 +909,7 @@ void gardenStateInterface()
 
 void drawInterface()
 {
-	if (wifi == 1)
+	if (wifiList == 1)
 	{
 		wifiMenu();
 	}
@@ -992,7 +1028,7 @@ void processData(const char *jsonData)
     	cJSON_Delete(root);
     	return;
     }
-    else if (wifi == 1)
+    else if (wifiList == 1)
     {
     	cJSON *networks = cJSON_GetObjectItem(root, "networks");
     	int networkIndex = 0;
@@ -1081,7 +1117,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 	xCoordinates = 240 - xCoordinates;
 	yCoordinates = 320 - yCoordinates;
-	if (wifi == 1)
+	if (wifiList == 1)
+	{
+		handleWifiListTouch();
+	}
+	else if (wifiConnect == 1)
 	{
 		handleKeyboardTouch();
 	}
