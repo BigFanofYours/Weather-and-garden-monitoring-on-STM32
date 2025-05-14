@@ -4,7 +4,7 @@
 
 const char* ssid = "1";
 const char* password = "25102004";
-const char* mqttServer = "test.mosquitto.org";
+const char* mqttServer = "broker.emqx.io";
 const char* requestTopic = "esp/request";    
 const char* responseTopic = "esp/response";
 

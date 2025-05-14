@@ -154,6 +154,7 @@ void drawKeyboard();
 char applyShift(char character);
 void handleKeyboardTouch();
 void handleWifiListTouch();
+void updatePassword();
 void wifiMenu();
 void connectToWifi();
 void weatherForecastMenu();
@@ -173,6 +174,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 void processData(const char *jsonData);
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 void resetBuffer();
+void resetPassword();
 /* USER CODE END 0 */
 
 /**
@@ -556,7 +558,9 @@ void handleKeyboardTouch()
     {
     	sprintf(wifiConnectionInfo, "{\"ssid\":\"%s\", \"password\":\"%s\"}+", selectedSSID, wifiPassword);
     	HAL_UART_Transmit(&huart1, (uint8_t*)wifiConnectionInfo, strlen(wifiConnectionInfo), HAL_MAX_DELAY);
-    	passwordIndex = 0;
+    	resetPassword();
+    	drawAlignedText("Sent info, exit this screen then", 115, 240, 12, NOBACKCOLOR);
+    	drawAlignedText("reconnect if typed password wrong", 130, 240, 12, NOBACKCOLOR);
     }
     else if (passwordIndex <= MAX_PASSWORD_LENGTH)
     {
@@ -568,8 +572,8 @@ void handleKeyboardTouch()
     	wifiPassword[passwordIndex++] = character;
     	wifiPassword[passwordIndex] = '\0';
     }
-    lcdSetCursor(0, 180);
-    lcdPrintf(wifiPassword);
+    updatePassword();
+    drawAlignedText(wifiPassword, 100, 240, 12, NOBACKCOLOR);
 }
 
 void handleWifiListTouch()
@@ -584,6 +588,17 @@ void handleWifiListTouch()
 	strncpy(selectedSSID, networkList[row + column * 6].ssid, MAX_SSID_LENGTH - 1);
 	selectedSSID[MAX_SSID_LENGTH - 1] = '\0';
 	connectToWifi();
+}
+
+void updatePassword()
+{
+	for (int y = 100; y < 115; y++)
+	{
+		for (int x = 0; x < 240; x++)
+		{
+			lcdDrawPixel(x, y, COLOR_BLACK);
+		}
+	}
 }
 
 void wifiMenu()
@@ -602,9 +617,7 @@ void wifiMenu()
 		lcdFillRoundRect(120, 25 + 50 * i, 122, 45, 10, COLOR_WHITE);
 		drawAlignedText(networkList[i + 6].ssid, 45 + 50 * i, 360, 12, NOBACKCOLOR);
 	}
-	memset(selectedSSID, 0, sizeof(selectedSSID));
-	memset(wifiPassword, 0, sizeof(wifiPassword));
-	memset(wifiConnectionInfo, 0, sizeof(wifiConnectionInfo));
+	resetPassword();
 }
 
 void connectToWifi()
@@ -615,7 +628,9 @@ void connectToWifi()
 	drawBackIcon();
 	wifiList = 0;
 	wifiConnect = 1;
+	drawAlignedText("Wifi name", 55, 240, 12, NOBACKCOLOR);
 	drawAlignedText(selectedSSID, 70, 240, 12, NOBACKCOLOR);
+	drawAlignedText("Enter password", 85, 240, 12, NOBACKCOLOR);
 }
 
 void weatherForecastMenu()
@@ -1138,6 +1153,14 @@ void resetBuffer()
 	{
 		rxBuffer[i] = 0;
 	}
+}
+
+void resetPassword()
+{
+	passwordIndex = 0;
+	memset(selectedSSID, 0, sizeof(selectedSSID));
+	memset(wifiPassword, 0, sizeof(wifiPassword));
+	memset(wifiConnectionInfo, 0, sizeof(wifiConnectionInfo));
 }
 /* USER CODE END 4 */
 
